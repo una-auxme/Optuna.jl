@@ -29,7 +29,7 @@ export RandomSampler
 # storage.jl
 export RDBStorage
 # artifacts.jl
-export FileSystemArtifactStore
+export FileSystemArtifactStore, ArtifactMeta
 # trial.jl
 export Trial
 # study.jl

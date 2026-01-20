@@ -14,7 +14,7 @@ makedocs(;
     modules=[Optuna],
     checkdocs=:exports,
     linkcheck=false,
-    pages=["Home" => "index.md"],
+    pages=["Home" => "index.md", "API Reference" => "api.md"],
 )
 
 deploydocs(; repo="github.com/una-auxme/Optuna.jl.git", devbranch="main")
