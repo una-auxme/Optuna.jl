@@ -1,0 +1,5 @@
+[deps]
+Optuna = "a5d0552b-b2dc-4f08-ac5c-85ca7d701b92"
+
+[compat]
+julia = "1.10.10"
