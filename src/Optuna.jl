@@ -11,7 +11,7 @@ using PythonCall
 const optuna = PythonCall.pynew()
 
 function __init__()
-    PythonCall.pycopy!(optuna, pyimport("optuna"))
+    return PythonCall.pycopy!(optuna, pyimport("optuna"))
 end
 
 include("pruners.jl")

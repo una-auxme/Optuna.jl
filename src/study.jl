@@ -48,7 +48,7 @@ function load_study(
 end
 
 function delete_study(study_name::String, storage::BaseStorage)
-    optuna.delete_study(; study_name=study_name, storage=storage.storage)
+    return optuna.delete_study(; study_name=study_name, storage=storage.storage)
 end
 
 function copy_study(
@@ -57,7 +57,7 @@ function copy_study(
     to_storage::BaseStorage,
     to_study_name::String="",
 )
-    optuna.copy_study(;
+    return optuna.copy_study(;
         from_study_name=from_study_name,
         from_storage=from_storage.storage,
         to_storage=to_storage.storage,
@@ -110,7 +110,7 @@ function upload_artifact(study::Study, trial::Trial, data::Dict)
     )
     trial.trial.set_user_attr("artifact_id", artifact_id)
 
-    rm(artifact_file)
+    return rm(artifact_file)
 end
 
 function get_all_artifact_meta(study::Study)
@@ -137,7 +137,7 @@ function get_all_artifact_meta(study::Study, trial)
 end
 
 function download_artifact(study::Study, artifact_id::String, file_path::String)
-    optuna.artifacts.download_artifact(;
+    return optuna.artifacts.download_artifact(;
         artifact_store=study.artifact_store.artifact_store,
         artifact_id=artifact_id,
         file_path=abspath(file_path) * "$artifact_id.jld2",
