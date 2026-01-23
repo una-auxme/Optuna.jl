@@ -1,6 +1,6 @@
 name = "Optuna"
 uuid = "a5d0552b-b2dc-4f08-ac5c-85ca7d701b92"
-authors = ["Julian Trommer <julian.trommer@uni-a.de>", "Valentin Höpfner <valentin.hoepfner@uni-a.de>", "Andreas Hofman <andreas.hofman@uni-a.de>", "Josef Kircher <josef.kircher@uni-a.de>", "Tobias Thummerer <tobias.thummerer@uni-a.de>"]
+authors = ["Julian Trommer <julian.trommer@uni-a.de>", "Valentin Höpfner <valentin.hoepfner@uni-a.de>", "Andreas Hofmann <andreas.hofmann@uni-a.de>", "Josef Kircher <josef.kircher@uni-a.de>", "Tobias Thummerer <tobias.thummerer@uni-a.de>"]
 version = "0.1.0"
 
 [deps]
@@ -10,7 +10,7 @@ PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [compat]
 CondaPkg = "0.2.0"
-JLD2 = "0.6"
+JLD2 = "0.5 - 0.6"
 PythonCall = "0.9.0"
 julia = "1.10"
 
