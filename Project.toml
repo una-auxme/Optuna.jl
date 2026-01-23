@@ -1,7 +1,7 @@
 name = "Optuna"
 uuid = "a5d0552b-b2dc-4f08-ac5c-85ca7d701b92"
-authors = ["Julian Trommer <julian.trommer@uni-a.de>"]
-version = "1.0.0"
+authors = ["Julian Trommer <julian.trommer@uni-a.de>", "Valentin Höpfner <valentin.hoepfner@uni-a.de>", "Andreas Hofman <andreas.hofman@uni-a.de>", "Josef Kircher <josef.kircher@uni-a.de>", "Tobias Thummerer <tobias.thummerer@uni-a.de>"]
+version = "0.1.0"
 
 [deps]
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
@@ -9,10 +9,10 @@ JLD2 = "033835bb-8acc-5ee8-8aae-3f567f8a3819"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [compat]
-CondaPkg = "0.2.33"
-JLD2 = "0.6.3"
-PythonCall = "0.9.31"
-julia = "1.10.10"
+CondaPkg = "0.2.0"
+JLD2 = "0.6"
+PythonCall = "0.9.0"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
