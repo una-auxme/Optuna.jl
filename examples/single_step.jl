@@ -6,12 +6,12 @@
 using Optuna
 
 # central database storage for all studies
-database_url = "example/storage"
+database_url = "examples/storage"
 database_name = "example_db"
 
 # name and artifact path for the study
 study_name = "example-study"
-artifact_path = "example/artifacts"
+artifact_path = "examples/artifacts"
 
 # parameter search space
 x_i = [0, 100]
