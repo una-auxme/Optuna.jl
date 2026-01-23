@@ -6,12 +6,12 @@
 using Optuna
 
 # central database storage for all studies
-database_url = "example/storage"
+database_url = "examples/storage"
 database_name = "example_db"
 
 # name and artifact path for the study
 study_name = "example-study"
-artifact_path = "example/artifacts"
+artifact_path = "examples/artifacts"
 
 # parameter search space
 x_i = [0, 100]
@@ -42,24 +42,37 @@ study = Study(
     load_if_exists=true,
 )
 
-# Step 4: Execute a single step
+# Step 4: Define objective function
+function objective(trial::Trial; x, y, z)
+    result = 0.0
+    for step in 1:10
+        result = z ? x * (y - param) : x * (y + param)
+        report(trial, result, step)
+        if should_prune(trial)
+            return nothing
+        end
+    end
+
+    upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
+    return result
+end
+
+# Step 5: Optimize a single trial
 trial = ask(study)
 
 x = suggest_int(trial, "x", x_i[1], x_i[2])
 y = suggest_float(trial, "y", y_i[1], y_i[2])
 z = suggest_categorical(trial, "z", z_i)
 
-score = z ? x * (y - param) : x * (y + param)
-report(trial, score, 1)
+score = objective(trial; x, y, z)
 
-upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
 if isnothing(score)
-    tell(study, trial; prune=false)
+    tell(study, trial; prune=true)
 else
     tell(study, trial, score)
 end
 
-# Step 5: Retrieve best trial information
+# Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))
 println("Best params: ", best_params(study))
 println("Best value: ", best_value(study))
