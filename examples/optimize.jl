@@ -43,6 +43,7 @@ study = Study(
 )
 
 # Step 4: Define objective function
+# with parameters as kwargs
 function objective(trial::Trial; x, y, z)
     result = 0.0
     for step in 1:10
@@ -54,6 +55,24 @@ function objective(trial::Trial; x, y, z)
     end
 
     upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
+    return result
+end
+# or with parameters as a NamedTuple
+function objective(trial::Trial, params::NamedTuple)
+    result = 0.0
+    for step in 1:10
+        result = params.z ? params.x * (params.y - param) : params.x * (params.y + param)
+        report(trial, result, step)
+        if should_prune(trial)
+            return nothing
+        end
+    end
+
+    upload_artifact(
+        study,
+        trial,
+        Dict("x" => params.x, "y" => params.y, "z" => params.z, "param" => param),
+    )
     return result
 end
 

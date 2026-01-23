@@ -23,7 +23,13 @@ function optimize(study::Study, objective::Function, params::NamedTuple; n_trial
             end
         end
 
-        score = objective(trial; args_fn...)
+        if hasmethod(objective, (Trial, NamedTuple))
+            score = objective(
+                trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
+            )
+        else
+            score = objective(trial; args_fn...)
+        end
         if isnothing(score)
             tell(study, trial; prune=true)
         else
