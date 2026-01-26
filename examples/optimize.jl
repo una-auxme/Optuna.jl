@@ -65,12 +65,14 @@ function objective(trial::Trial, params::NamedTuple)
     result = 0.0
     for step in 1:10
         result = params.z ? params.x * (params.y - param) : params.x * (params.y + param)
+        # Report the intermediate value to the trial
         report(trial, result, step)
+        # Check if the trial should be pruned
         if should_prune(trial)
             return nothing
         end
     end
-
+    # Upload artifacts related to this trial
     upload_artifact(
         study,
         trial,
