@@ -21,4 +21,4 @@ This package is based on the Python API that is provided by Preferred Networks, 
 3. Examples for hyperparameter optimization are provided in the [examples folder](https://github.com/una-auxme/Optuna.jl/tree/main/examples). You can also refer to the [documentation](https://una-auxme.github.io/Optuna.jl/dev/overview) for further information.
 
 ## How to contribute
-Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide]((https://github.com/SciML/ColPrac)) on Collaborative Practices for Community Packages.
+Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide](https://github.com/SciML/ColPrac) on Collaborative Practices for Community Packages.
