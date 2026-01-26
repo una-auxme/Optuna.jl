@@ -54,7 +54,7 @@ export Study
 export TrialState
 
 # storage.jl
-export get_all_study_names
+export get_all_study_names, create_sqlite_url, create_mysql_url
 # trial.jl
 export suggest_int, suggest_float, suggest_categorical, report, should_prune
 # study.jl

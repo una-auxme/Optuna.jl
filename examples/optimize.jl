@@ -26,7 +26,8 @@ pruner = MedianPruner()
 ###
 
 # Step 1: Create/Load database storage for studies
-storage = RDBStorage(database_url, database_name)
+storage_url = create_sqlite_url(database_url, database_name)
+storage = RDBStorage(storage_url)
 
 # Step 2: Create artifact store for the study
 artifact_store = FileSystemArtifactStore(artifact_path)
@@ -43,6 +44,7 @@ study = Study(
 )
 
 # Step 4: Define objective function
+# with parameters as kwargs
 function objective(trial::Trial; x, y, z)
     result = 0.0
     for step in 1:10
@@ -54,6 +56,24 @@ function objective(trial::Trial; x, y, z)
     end
 
     upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
+    return result
+end
+# or with parameters as a NamedTuple
+function objective(trial::Trial, params::NamedTuple)
+    result = 0.0
+    for step in 1:10
+        result = params.z ? params.x * (params.y - param) : params.x * (params.y + param)
+        report(trial, result, step)
+        if should_prune(trial)
+            return nothing
+        end
+    end
+
+    upload_artifact(
+        study,
+        trial,
+        Dict("x" => params.x, "y" => params.y, "z" => params.z, "param" => param),
+    )
     return result
 end
 

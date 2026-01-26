@@ -28,30 +28,30 @@ function optimize(study::Study, objective::Function, params::NamedTuple; n_trial
 
             args_fn = Dict{Symbol,Any}()
 
-            trial = nothing
+            trial = ask(study; multithreading=multithreading)
 
-            #lock_ask() do
-            #    PythonCall.GIL.lock() do 
-                    trial = ask(study; multithreading=multithreading)
-
-                    for k in keys(params)
-                        v = params[k]
-                        if v[1] isa Signed
-                            args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
-                        elseif v[1] isa AbstractFloat
-                            args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
-                        elseif v isa Vector
-                            args_fn[k] = suggest_categorical(trial, string(k), v)
-                        else
-                            error(
-                                "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
-                            )
-                        end
-                    end
-            #    end
-            #end
-            
+            for k in keys(params)
+                v = params[k]
+                if v[1] isa Signed
+                    args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
+                elseif v[1] isa AbstractFloat
+                    args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
+                elseif v isa Vector
+                    args_fn[k] = suggest_categorical(trial, string(k), v)
+                else
+                    error(
+                        "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
+                    )
+                end
+            end
+           
+            if hasmethod(objective, (Trial, NamedTuple))
+            score = objective(
+                trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
+            )
+        else
             score = objective(trial; args_fn...)
+        end
             
             #PythonCall.GIL.lock() do 
                 if isnothing(score)
