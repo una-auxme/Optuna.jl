@@ -7,6 +7,14 @@ using JLD2
 
 abstract type BaseArtifactStore end
 
+"""
+    FileSystemArtifactStore(path::String)
+
+Data structure for a file system based artifact store.
+
+## Arguments
+- `path::String`: Path to the directory where artifacts are stored.
+"""
 struct FileSystemArtifactStore <: BaseArtifactStore
     artifact_store::Any
     path::String
@@ -19,6 +27,11 @@ struct FileSystemArtifactStore <: BaseArtifactStore
     end
 end
 
+"""
+    ArtifactMeta
+
+Data structure containing metadata for an artifact.
+"""
 struct ArtifactMeta
     artifact_id::String
     mimetype::String
