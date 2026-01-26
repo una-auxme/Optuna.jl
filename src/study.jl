@@ -153,8 +153,14 @@ This function is safe for multithreading.
 # Arguments 
 - `study::Study` the study to ask.
 """
-function ask(study::Study)
-    return Trial(study.study.ask())
+function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
+    if multithreading
+        thread_safe() do
+            return Trial{true}(study.study.ask())
+        end
+    else
+        return Trial{false}(study.study.ask())
+    end
 end
 
 """

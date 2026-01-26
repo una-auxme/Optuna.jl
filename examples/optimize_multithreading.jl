@@ -70,9 +70,7 @@ else
 end
 
 # Step 5: Optimize the study
-ts = time()
 @time optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=20, n_jobs=4, verbose=true)
-dt = time() - ts
 
 # Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))

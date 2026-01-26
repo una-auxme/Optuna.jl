@@ -47,7 +47,9 @@ Suggest a float value for the given parameter name within the specified range.
 ## Returns
 - `T`: Suggested float value.
 """
-function suggest_float(trial::Trial{false}, name::String, low::T, high::T) where {T<:AbstractFloat}
+function suggest_float(
+    trial::Trial{false}, name::String, low::T, high::T
+) where {T<:AbstractFloat}
     return pyconvert(T, trial.trial.suggest_float(name, low, high))
 end
 function suggest_float(
@@ -95,7 +97,7 @@ Report an intermediate value for the given trial at a specific step.
 - `value::AbstractFloat`: The intermediate value to report.
 - `step::Int`: The step at which the value is reported.
 """
-function report(trial::::Trial{false}, value::AbstractFloat, step::Int)
+function report(trial::Trial{false}, value::AbstractFloat, step::Int)
     return trial.trial.report(value; step=step)
 end
 function report(trial::Trial{true}, value::AbstractFloat, step::Int)
