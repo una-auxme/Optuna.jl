@@ -48,11 +48,11 @@ function objective(trial::Trial; x, y, z)
     for step in 1:10
         result = z ? x * (y - param) : x * (y + param)
         sleep(0.1)
-        
+
         report(trial, result, step)
-    
+
         if should_prune(trial)
-           return nothing
+            return nothing
         end
     end
 
@@ -70,7 +70,7 @@ end
 # Step 5: Optimize the study
 ts = time()
 @time optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=20, n_jobs=4, verbose=true)
-dt = time()-ts 
+dt = time()-ts
 
 # Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))

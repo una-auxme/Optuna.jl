@@ -20,7 +20,7 @@ function thread_safe(f)
     res = nothing
     lock(lk)
     try
-        PythonCall.GIL.lock() do 
+        PythonCall.GIL.lock() do
             res = f()
         end
     finally

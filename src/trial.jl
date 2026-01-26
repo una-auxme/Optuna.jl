@@ -16,10 +16,14 @@ function suggest_int(trial::Trial{true}, name::String, low::T, high::T) where {T
     end
 end
 
-function suggest_float(trial::Trial{false}, name::String, low::T, high::T) where {T<:AbstractFloat}
+function suggest_float(
+    trial::Trial{false}, name::String, low::T, high::T
+) where {T<:AbstractFloat}
     return pyconvert(T, trial.trial.suggest_float(name, low, high))
 end
-function suggest_float(trial::Trial{true}, name::String, low::T, high::T) where {T<:AbstractFloat}
+function suggest_float(
+    trial::Trial{true}, name::String, low::T, high::T
+) where {T<:AbstractFloat}
     thread_safe() do
         return pyconvert(T, trial.trial.suggest_float(name, low, high))
     end

@@ -74,11 +74,11 @@ This function is safe for multithreading.
 # Arguments 
 - `study::Study` the study to ask.
 """
-function ask(study::Study; multithreading = Threads.threadid() != 1)
+function ask(study::Study; multithreading=Threads.threadid() != 1)
     multithreading = Threads.threadid() != 1
 
     if multithreading
-        thread_safe() do 
+        thread_safe() do
             return Trial{true}(study.study.ask())
         end
     else
@@ -97,7 +97,11 @@ This function is safe for multithreading.
 - ToDo
 """
 function tell(
-    study::Study, trial::Trial, score::Union{Nothing,T,Vector{T}}=nothing; prune::Bool=false, multithreading = Threads.threadid() != 1
+    study::Study,
+    trial::Trial,
+    score::Union{Nothing,T,Vector{T}}=nothing;
+    prune::Bool=false,
+    multithreading=Threads.threadid() != 1,
 ) where {T<:AbstractFloat}
     if isnothing(score) && !prune
         throw(
@@ -108,7 +112,7 @@ function tell(
     end
 
     if multithreading
-        thread_safe() do 
+        thread_safe() do
             if prune
                 study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
             else
@@ -122,7 +126,6 @@ function tell(
             study.study.tell(trial.trial, score)
         end
     end
-
 end
 
 function best_trial(study::Study)
