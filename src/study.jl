@@ -154,6 +154,9 @@ This function is safe for multithreading.
 
 # Arguments 
 - `study::Study` the study to ask.
+
+# Keyowords
+- `multithreading::Bool` if multithreading is used, default is automatically detected (true if more than one thread is available)
 """
 function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
     if multithreading
