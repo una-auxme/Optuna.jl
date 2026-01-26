@@ -3,14 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-function create_test_study(pruner::Optuna.BasePruner; name="test_study")
-    test_dir = mktempdir()
-    storage = RDBStorage(create_sqlite_url(test_dir, name))
-    artifacts = FileSystemArtifactStore(joinpath(test_dir, "artifacts"))
-    study = Study(name, artifacts, storage; pruner=pruner)
-    return study, test_dir
-end
-
 function test_pruner(pruner::Optuna.BasePruner)
     study, test_dir = create_test_study(pruner)
 
@@ -29,6 +21,7 @@ function test_pruner(pruner::Optuna.BasePruner)
 
     tell(study, trial, 100.0)
     rm(test_dir; recursive=true)
+    return nothing
 end
 
 @testset "pruners" begin

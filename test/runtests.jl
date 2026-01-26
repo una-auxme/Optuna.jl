@@ -6,6 +6,8 @@
 using Optuna
 using Test
 
+include("utils.jl")
+
 @testset "Optuna.jl" begin
     include("pruners.jl")
     include("samplers.jl")
