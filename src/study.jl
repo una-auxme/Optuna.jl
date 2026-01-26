@@ -4,7 +4,9 @@
 #
 
 """
-    This data structure represents an Optuna study and its corresponding artifact and data storage. A study is a collection of trials that share the same optimization objective.
+    Study(study, artifact_stpre, storage)
+
+This data structure represents an Optuna study and its corresponding artifact and data storage. A study is a collection of trials that share the same optimization objective.
 """
 struct Study
     study::Any

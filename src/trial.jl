@@ -4,7 +4,9 @@
 #
 
 """
-    Trial is a data structure wrapper for an Optuna trial.
+    Trial(trial)
+    
+Trial is a data structure wrapper for an Optuna trial.
 """
 struct Trial{multithreading}
     trial::Any
