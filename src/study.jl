@@ -98,7 +98,27 @@ This function is safe for multithreading.
 """
 function tell(
     study::Study,
-    trial::Trial,
+    trial::Trial{false},
+    score::Union{Nothing,T,Vector{T}}=nothing;
+    prune::Bool=false,
+) where {T<:AbstractFloat}
+    if isnothing(score) && !prune
+        throw(
+            ArgumentError(
+                "The score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
+            ),
+        )
+    end
+
+    if prune
+        study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
+    else
+        study.study.tell(trial.trial, score)
+    end
+end
+function tell(
+    study::Study,
+    trial::Trial{true},
     score::Union{Nothing,T,Vector{T}}=nothing;
     prune::Bool=false,
     multithreading=Threads.threadid() != 1,
@@ -106,20 +126,12 @@ function tell(
     if isnothing(score) && !prune
         throw(
             ArgumentError(
-                "th the score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
+                "The score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
             ),
         )
     end
 
-    if multithreading
-        thread_safe() do
-            if prune
-                study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
-            else
-                study.study.tell(trial.trial, score)
-            end
-        end
-    else
+    thread_safe() do
         if prune
             study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
         else

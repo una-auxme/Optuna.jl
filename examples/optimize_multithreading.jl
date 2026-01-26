@@ -26,7 +26,8 @@ pruner = MedianPruner()
 ###
 
 # Step 1: Create/Load database storage for studies
-storage = RDBStorage(database_url, database_name)
+storage_url = create_sqlite_url(database_url, database_name)
+storage = RDBStorage(storage_url)
 
 # Step 2: Create artifact store for the study
 artifact_store = FileSystemArtifactStore(artifact_path)

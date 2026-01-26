@@ -21,12 +21,45 @@ function optimize(
 
     if n_jobs == 1
         return optimize_singlethreading(
-            study, objective, params; n_trials=n_trails, verbose=verbose
+            study, objective, params; n_trials=n_trials, verbose=verbose
         )
     else
         return optimize_multithreading(
-            study, objective, params; n_trials=n_trails, verbose=verbose
+            study, objective, params; n_trials=n_trials, verbose=verbose
         )
+    end
+end
+
+function run_trial(study, trial, params, objective)
+    args_fn = Dict{Symbol,Any}()
+
+    for k in keys(params)
+        v = params[k]
+        if v[1] isa Signed
+            args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
+        elseif v[1] isa AbstractFloat
+            args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
+        elseif v isa Vector
+            args_fn[k] = suggest_categorical(trial, string(k), v)
+        else
+            error(
+                "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
+            )
+        end
+    end
+
+    if hasmethod(objective, (Trial, NamedTuple))
+        score = objective(
+            trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
+        )
+    else
+        score = objective(trial; args_fn...)
+    end
+
+    if isnothing(score)
+        tell(study, trial; prune=true)
+    else
+        tell(study, trial, score)
     end
 end
 
@@ -37,45 +70,14 @@ function optimize_singlethreading(
     n_trials::Int=100,
     verbose::Bool=false,
 )
-    multithreading = false
-
     for i in 1:n_trials
         if verbose
             @info "[$(Threads.threadid())] Starting trial $(i) / $(n_trials)"
         end
 
-        args_fn = Dict{Symbol,Any}()
+        trial = ask(study; multithreading=false)
 
-        trial = ask(study; multithreading=multithreading)
-
-        for k in keys(params)
-            v = params[k]
-            if v[1] isa Signed
-                args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
-            elseif v[1] isa AbstractFloat
-                args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
-            elseif v isa Vector
-                args_fn[k] = suggest_categorical(trial, string(k), v)
-            else
-                error(
-                    "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
-                )
-            end
-        end
-
-        if hasmethod(objective, (Trial, NamedTuple))
-            score = objective(
-                trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
-            )
-        else
-            score = objective(trial; args_fn...)
-        end
-
-        if isnothing(score)
-            tell(study, trial; prune=true, multithreading=multithreading)
-        else
-            tell(study, trial, score; multithreading=multithreading)
-        end
+        run_trial(study, trial, params, objective)
     end
 
     return study
@@ -96,38 +98,9 @@ function optimize_multithreading(
                 @info "[$(Threads.threadid())] Starting trial $(i) / $(n_trials)"
             end
 
-            args_fn = Dict{Symbol,Any}()
+            trial = ask(study; multithreading=true)
 
-            trial = ask(study; multithreading=multithreading)
-
-            for k in keys(params)
-                v = params[k]
-                if v[1] isa Signed
-                    args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
-                elseif v[1] isa AbstractFloat
-                    args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
-                elseif v isa Vector
-                    args_fn[k] = suggest_categorical(trial, string(k), v)
-                else
-                    error(
-                        "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
-                    )
-                end
-            end
-
-            if hasmethod(objective, (Trial, NamedTuple))
-                score = objective(
-                    trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
-                )
-            else
-                score = objective(trial; args_fn...)
-            end
-
-            if isnothing(score)
-                tell(study, trial; prune=true, multithreading=multithreading)
-            else
-                tell(study, trial, score; multithreading=multithreading)
-            end
+            run_trial(study, trial, params, objective)
         end
     end
 
