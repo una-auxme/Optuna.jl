@@ -65,12 +65,39 @@ function copy_study(
     )
 end
 
-function ask(study::Study)
-    return Trial(study.study.ask())
+"""
+    ask(study)
+
+Wrapper for the Optuna `ask` function [ToDo: link URL].
+This function is safe for multithreading.
+
+# Arguments 
+- `study::Study` the study to ask.
+"""
+function ask(study::Study; multithreading = Threads.threadid() != 1)
+    multithreading = Threads.threadid() != 1
+
+    if multithreading
+        thread_safe() do 
+            return Trial{true}(study.study.ask())
+        end
+    else
+        return Trial{false}(study.study.ask())
+    end
 end
 
+"""
+    tell(study, trial, score; kwargs...)
+
+Wrapper for the Optuna `tell` function [ToDo: link URL].
+This function is safe for multithreading.
+
+# Arguments 
+- `study::Study` the study to ask.
+- ToDo
+"""
 function tell(
-    study::Study, trial::Trial, score::Union{Nothing,T,Vector{T}}=nothing; prune::Bool=false
+    study::Study, trial::Trial, score::Union{Nothing,T,Vector{T}}=nothing; prune::Bool=false, multithreading = Threads.threadid() != 1
 ) where {T<:AbstractFloat}
     if isnothing(score) && !prune
         throw(
@@ -79,11 +106,23 @@ function tell(
             ),
         )
     end
-    if prune
-        study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
+
+    if multithreading
+        thread_safe() do 
+            if prune
+                study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
+            else
+                study.study.tell(trial.trial, score)
+            end
+        end
     else
-        study.study.tell(trial.trial, score)
+        if prune
+            study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
+        else
+            study.study.tell(trial.trial, score)
+        end
     end
+
 end
 
 function best_trial(study::Study)
@@ -98,7 +137,7 @@ function best_value(study::Study)
     return study.study.best_value
 end
 
-function upload_artifact(study::Study, trial::Trial, data::Dict)
+function upload_artifact(study::Study, trial::Trial{false}, data::Dict)
     artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
 
     JLD2.save(artifact_file, data)
@@ -111,6 +150,22 @@ function upload_artifact(study::Study, trial::Trial, data::Dict)
     trial.trial.set_user_attr("artifact_id", artifact_id)
 
     return rm(artifact_file)
+end
+function upload_artifact(study::Study, trial::Trial{true}, data::Dict)
+    artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
+
+    thread_safe() do
+        JLD2.save(artifact_file, data)
+        artifact_id = optuna.artifacts.upload_artifact(;
+            artifact_store=study.artifact_store.artifact_store,
+            file_path=artifact_file,
+            study_or_trial=trial.trial,
+            storage=study.storage.storage,
+        )
+        trial.trial.set_user_attr("artifact_id", artifact_id)
+
+        return rm(artifact_file)
+    end
 end
 
 function get_all_artifact_meta(study::Study)

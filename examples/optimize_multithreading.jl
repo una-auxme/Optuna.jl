@@ -47,18 +47,30 @@ function objective(trial::Trial; x, y, z)
     result = 0.0
     for step in 1:10
         result = z ? x * (y - param) : x * (y + param)
+        sleep(0.1)
+        
         report(trial, result, step)
+    
         if should_prune(trial)
-            return nothing
+           return nothing
         end
     end
 
-    upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
+    #upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
     return result
 end
 
+nthreads = Threads.nthreads()
+if nthreads == 1
+    @warn "Mulththreading tests running on single thread."
+else
+    @info "Multithreading tests running on $(nthreads) threads ($(Threads.nthreads(:interactive)) interactive), main thread is $(Threads.threadid())."
+end
+
 # Step 5: Optimize the study
-optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=10, n_jobs=1)
+ts = time()
+@time optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=16, n_jobs=4, verbose=true)
+dt = time()-ts 
 
 # Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))
