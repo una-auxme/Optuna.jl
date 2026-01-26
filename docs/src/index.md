@@ -1,1 +1,0 @@
-This a generic landing page for Optuna.jl probably copy readme
