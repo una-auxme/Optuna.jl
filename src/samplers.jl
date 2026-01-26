@@ -9,19 +9,19 @@
 abstract type BaseSampler end
 
 """
-    RandomSampler(seed=nothing::Union{Nothing,Int})
+    RandomSampler(seed=nothing::Union{Nothing,UInt32})
 
 An independent sampler that samples randomly
 
 ## Arguments
-- `seed::Union{Nothing,Int}=nothing`: Seed for the random number generator.
+- `seed::Union{Nothing,UInt32}=nothing`: Seed for the random number generator.
 """
 struct RandomSampler <: BaseSampler
     sampler::Any
 
-    function RandomSampler(seed=nothing::Union{Nothing,Int})
+    function RandomSampler(seed=nothing::Union{Nothing,UInt32})
         sampler = optuna.samplers.RandomSampler(
-            isnothing(seed) ? PythonCall.pybuiltins.None : pyconvert(Int, seed)
+            isnothing(seed) ? PythonCall.pybuiltins.None : pyconvert(UInt32, seed)
         )
         return new(sampler)
     end
