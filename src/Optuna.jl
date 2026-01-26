@@ -36,7 +36,6 @@ include("artifacts.jl")
 include("trial.jl")
 include("study.jl")
 include("optimize.jl")
-#include("multithreading.jl")
 
 # pruners.jl
 export MedianPruner
