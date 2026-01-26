@@ -3,6 +3,26 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+"""
+    optimize(study::Study, objective::Function, params::NamedTuple; n_trials=100::Int)
+
+Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+
+Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
+
+If the objective function returns `nothing`, the trial is pruned.
+
+## Arguments
+- `study::Study`: [Study](@ref) that should be optimized.
+- `objective::Function`: Function that takes a trial and returns a score.
+- `params::NamedTuple`: Named tuple of parameters to optimize.
+
+## Keyword Arguments
+- `n_trials::Int`: Number of trials to run.
+
+## Returns
+- `Study`: The optimized study. [Study](@ref)
+"""
 function optimize(
     study::Study,
     objective::Function,
