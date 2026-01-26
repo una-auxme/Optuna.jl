@@ -9,3 +9,6 @@ Manifest.toml
 
 # VSCode files
 .vscode/
+
+# Generated example files
+.example/

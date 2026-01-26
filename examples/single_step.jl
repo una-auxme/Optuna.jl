@@ -13,7 +13,7 @@ database_name = "example_db"
 study_name = "example-study"
 artifact_path = "example/artifacts"
 
-# parameter search space
+# parameter search space for int(x_i), float(y_i), categorical(z_i) data
 x_i = [0, 100]
 y_i = [-10.0f0, 10.0f0]
 z_i = [true, false]
@@ -43,16 +43,23 @@ study = Study(
 )
 
 # Step 4: Execute a single step
+# ask the study for a new trial
 trial = ask(study)
 
+# get a set of parameters for the trial suggested by the sampler
 x = suggest_int(trial, "x", x_i[1], x_i[2])
 y = suggest_float(trial, "y", y_i[1], y_i[2])
 z = suggest_categorical(trial, "z", z_i)
 
+# evaluate the objective function with the suggested parameters
 score = z ? x * (y - param) : x * (y + param)
+
+# Report the intermediate value to the trial
 report(trial, score, 1)
 
+# Upload artifacts related to this trial
 upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
+# tell the study the result of the trial. If the score was nothing, the trial should be pruned by passing prune=true
 if isnothing(score)
     tell(study, trial; prune=false)
 else

@@ -13,7 +13,7 @@ database_name = "example_db"
 study_name = "example-study"
 artifact_path = "example/artifacts"
 
-# parameter search space
+# parameter search space for int(x_i), float(y_i), categorical(z_i) data
 x_i = [0, 100]
 y_i = [-10.0f0, 10.0f0]
 z_i = [true, false]
@@ -48,17 +48,19 @@ function objective(trial::Trial; x, y, z)
     for step in 1:10
         sleep(10)
         result = z ? x * (y - param) : x * (y + param)
+        # Report the intermediate value to the trial
         report(trial, result, step)
+        # Check if the trial should be pruned
         if should_prune(trial)
             return nothing
         end
     end
-
+    # Upload artifacts related to this trial
     upload_artifact(study, trial, Dict("x" => x, "y" => y, "z" => z, "param" => param))
     return result
 end
 
-# Step 5: Optimize the study
+# Step 5: Optimize the objective function of the study with a set of parameters suggested by the sampler
 optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=10)
 
 # Step 6: Retrieve best trial information
