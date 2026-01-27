@@ -239,7 +239,7 @@ Get the best trial of the study.
 - `Trial`: The best trial. (see [Trial](@ref))
 """
 function best_trial(study::Study)
-    return Trial(study.study.best_trial)
+    return Trial{false}(study.study.best_trial)
 end
 
 """

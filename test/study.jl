@@ -5,31 +5,31 @@
 
 @testset "study" begin
     @testset "Study construction" begin
-        study, test_dir, _, _ = create_test_study(; name="construct_test")
+        study, test_dir = create_test_study(; study_name="construct_test")
         @test study isa Study
     end
 
     @testset "Study direction" begin
         # minimize (default)
-        study, test_dir, _, _ = create_test_study(;
-            name="minimize_test", direction="minimize"
+        study, test_dir = create_test_study(;
+            study_name="minimize_test", direction="minimize"
         )
         @test study isa Study
 
         # maximize
-        study, test_dir, _, _ = create_test_study(;
-            name="maximize_test", direction="maximize"
+        study, test_dir = create_test_study(;
+            study_name="maximize_test", direction="maximize"
         )
         @test study isa Study
 
         # invalid direction should error
         @test_throws ErrorException create_test_study(;
-            name="invalid_test", direction="invalid"
+            study_name="invalid_test", direction="invalid"
         )
     end
 
     @testset "ask/tell workflow" begin
-        study, test_dir, _, _ = create_test_study(; name="ask_tell_test")
+        study, test_dir = create_test_study(; study_name="ask_tell_test")
 
         trial = ask(study)
         @test trial isa Trial
@@ -39,7 +39,7 @@
     end
 
     @testset "best_trial, best_params, best_value" begin
-        study, test_dir, _, _ = create_test_study(; name="best_test")
+        study, test_dir = create_test_study(; study_name="best_test")
 
         # run a few trials
         for value in [5.0, 3.0, 7.0]
@@ -101,7 +101,7 @@
     end
 
     @testset "tell with prune" begin
-        study, test_dir, _, _ = create_test_study(; name="prune_tell_test")
+        study, test_dir = create_test_study(; study_name="prune_tell_test")
 
         trial = ask(study)
         tell(study, trial; prune=true)

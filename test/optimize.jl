@@ -37,7 +37,7 @@ function test_optimize_permutations(n_jobs, verbose)
 
     #@test best_value(study) < 0.0
 
-    return cleanup_test_study(study, test_dir)
+    return nothing
 end
 
 @testset "optimize" begin
