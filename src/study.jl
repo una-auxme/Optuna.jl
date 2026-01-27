@@ -197,10 +197,10 @@ Get the best trial of the study.
 - `study::Study`: The study to get the best trial from. (see [Study](@ref))
 
 ## Returns
-- `trial`: The best trial. (see [Trial](@ref))
+- `Trial`: The best trial. (see [Trial](@ref))
 """
 function best_trial(study::Study)
-    return study.study.best_trial
+    return Trial(study.study.best_trial)
 end
 
 """
@@ -212,10 +212,10 @@ Get the best parameters of the study.
 - `study::Study`: The study to get the best parameters from. (see [Study](@ref))
 
 ## Returns
-- `parameters`: The best parameters.
+- `Dict{String,Any}`: The best parameters.
 """
 function best_params(study::Study)
-    return study.study.best_params
+    return pyconvert(Dict{String,Any}, study.study.best_params)
 end
 
 """
@@ -227,10 +227,10 @@ Get the best objective value of the study.
 - `study::Study`: The study to get the best objective value from. (see [Study](@ref))
 
 ## Returns
-- `value`: The best objective value.
+- `Float64`: The best objective value.
 """
 function best_value(study::Study)
-    return study.study.best_value
+    return pyconvert(Float64, study.study.best_value)
 end
 
 """
