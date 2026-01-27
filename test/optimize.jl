@@ -37,12 +37,16 @@ function test_optimize_permutations(n_jobs, verbose)
 
     #@test best_value(study) < 0.0
 
-    return cleanup_test_study(study, test_dir)
+    return nothing
 end
 
 @testset "optimize" begin
     for verbose in (false, true)
         for n_jobs in (1, 4)
+            # skip multi-threaded tests if not enough threads available
+            if n_jobs > Threads.nthreads()
+                continue
+            end
             @testset "n_jobs=$(n_jobs), verbose=$(verbose)" begin
                 test_optimize_permutations(n_jobs, verbose)
             end
