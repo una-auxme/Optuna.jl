@@ -58,6 +58,11 @@
         @test i isa Int
         @test i in [1, 2, 3]
 
+        # float choices
+        i = suggest_categorical(trial, "f", [-Inf, pi, 1e14])
+        @test i isa AbstractFloat
+        @test i in [-Inf, pi, 1e14]
+
         tell(study, trial, 1.0)
     end
 
