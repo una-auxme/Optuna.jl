@@ -3,6 +3,4 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-@testset "artifacts" begin
-
-end
+@testset "artifacts" begin end
