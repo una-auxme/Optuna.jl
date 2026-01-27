@@ -41,7 +41,7 @@ function test_sampler_reproducibility(sampler_constructor)
         end
         cleanup_test_study(study, test_dir)
     end
-    
+
     @test results1 == results2
     return nothing
 end
