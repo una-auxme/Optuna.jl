@@ -67,8 +67,6 @@
         # load the same study
         study2 = load_study("load_test", storage, artifacts)
         @test best_value(study2) == 42.0
-
-        rm(test_dir; recursive=true)
     end
 
     @testset "delete_study" begin
