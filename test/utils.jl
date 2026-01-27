@@ -11,8 +11,8 @@ function create_test_study(;
     pruner=MedianPruner(),
     direction="minimize",
 )
-    database_path=joinpath(path, "storage")
-    artifact_path=joinpath(path, "artifacts")
+    database_path = joinpath(path, "storage")
+    artifact_path = joinpath(path, "artifacts")
 
     if !isdir(database_path)
         mkdir(database_path)
