@@ -6,6 +6,15 @@
 using Optuna
 using Test
 
+include("utils.jl")
+
 @testset "Optuna.jl" begin
-    # Write your tests here.
+    include("pruners.jl")
+    include("samplers.jl")
+    include("storage.jl")
+    include("artifacts.jl")
+    include("trial.jl")
+    include("study.jl")
+    include("optimize.jl")
+    include("single_step.jl")
 end
