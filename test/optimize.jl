@@ -3,15 +3,13 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-study = setup_test_study()
-
 # parameter search space for int(x_i), float(y_i), categorical(z_i) data
 x_i = [0, 100]
 y_i = [-10.0f0, 10.0f0]
 z_i = [true, false]
 param = 5.0
 
-function objective(trial::Trial; x, y, z)
+function objective(study, trial::Trial; x, y, z)
     result = 0.0
     for step in 1:10
         result = z ? x * (y - param) : x * (y + param)
@@ -28,15 +26,32 @@ function objective(trial::Trial; x, y, z)
 end
 
 # Optimize the objective function of the study with a set of parameters suggested by the sampler
-for verbose in (false, true)
-    for n_jobs in (1, 4)
-        optimize(
-            study,
-            objective,
-            (x=x_i, y=y_i, z=z_i);
-            n_trials=10,
-            n_jobs=n_jobs,
-            verbose=verbose,
-        )
+function test_optimize_permutations(n_jobs, verbose)
+    study, test_dir = create_test_study()
+
+    obj = function(trial; x, y, z)
+        objective(study, trial; x=x, y=y, z=z)
+    end
+
+    optimize(
+        study,
+        obj,
+        (x=x_i, y=y_i, z=z_i);
+        n_trials=10,
+        n_jobs=n_jobs,
+        verbose=verbose,
+    )
+
+    rm(test_dir; recursive=true)
+end
+
+@testset "optimize" begin 
+    for verbose in (false, true)
+        for n_jobs in (1, 4)
+            @testset "n_jobs=$(n_jobs), verbose=$(verbose)" begin
+                test_optimize_permutations(n_jobs, verbose)
+            end
+        end
     end
 end
+

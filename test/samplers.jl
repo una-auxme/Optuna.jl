@@ -4,7 +4,7 @@
 #
 
 function test_sampler(sampler::Optuna.BaseSampler)
-    study, test_dir = create_test_study(sampler)
+    study, test_dir = create_test_study(;sampler=sampler)
 
     # run a few trials and verify parameter suggestions work
     for _ in 1:3
