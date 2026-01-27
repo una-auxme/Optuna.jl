@@ -11,8 +11,8 @@ function create_test_study(;
     pruner=MedianPruner(),
     direction="minimize",
 )
-    database_path=joinpath(path, "storage")
-    artifact_path=joinpath(path, "artifacts")
+    database_path = joinpath(path, "storage")
+    artifact_path = joinpath(path, "artifacts")
 
     if !isdir(database_path)
         mkdir(database_path)
@@ -42,6 +42,6 @@ function create_test_study(;
 end
 
 function cleanup_test_study(study, test_dir)
-    # This is not necessary, because mktempdir cleans up automatically with process EOF. 
+    # This is not necessary, because mktempdir cleans up automatically with process EOF.
     # rm(test_dir; recursive=true)
 end
