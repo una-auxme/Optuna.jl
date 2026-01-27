@@ -31,12 +31,19 @@ function optimize(
     verbose::Bool=false,
     n_jobs::Integer=1,
 )
-    @assert n_jobs > 0 "`optimize` is called with keyword `n_jobs=$(n_jobs)`, this doesn't make any sense."
-    @assert n_jobs == 1 || n_jobs <= Threads.nthreads() "`optimize` is called with keyword `n_jobs=$(n_jobs)`, but process only provides $(Threads.nthreads()) threads."
-    @assert n_jobs == 1 || Threads.nthreads(:interactive) == 1 "`optimize` is called with keyword `n_jobs=$(n_jobs)`, therefore we require exactly one interactive thread. The number of interactive threads is `$(Threads.nthreads(:interactive))`."
+    @assert n_jobs > 0 "`optimize` is called with keyword `n_jobs=$(n_jobs)`," *
+        "this doesn't make any sense."
+    @assert n_jobs == 1 || n_jobs <= Threads.nthreads() "`optimize` is called with " *
+        "keyword `n_jobs=$(n_jobs)`, but process only provides $(Threads.nthreads()) threads."
+    @assert n_jobs == 1 || Threads.nthreads(:interactive) == 1 "`optimize` is called " *
+        "with keyword `n_jobs=$(n_jobs)`, therefore we require exactly one interactive " *
+        "thread. The number of interactive threads is `$(Threads.nthreads(:interactive))`. " *
+        "You can start Julia with n threads and an interactive thread by setting the " *
+        "environment variable `JULIA_NUM_THREADS=n,1` or start the Julia REPL with `-t n,1`."
 
     if n_jobs > 1 && n_jobs < Threads.nthreads()
-        @warn "`optimize` is called with keyword `n_jobs=$(n_jobs)`, however, $(Threads.nthreads()) are allocated. All threads will be used for calculation."
+        @warn "`optimize` is called with keyword `n_jobs=$(n_jobs)`, however, " *
+            "$(Threads.nthreads()) are allocated. All threads will be used for calculation."
     end
 
     if n_jobs == 1
@@ -63,7 +70,8 @@ function run_trial(study, trial, params, objective)
             args_fn[k] = suggest_categorical(trial, string(k), v)
         else
             error(
-                "Unsupported parameter type for key: $k => value $(typeof(v)). Possible types are Int, AbstractFloat, and Vector.",
+                "Unsupported parameter type for key: $k => value $(typeof(v)). " *
+                "Possible types are Int, AbstractFloat, and Vector.",
             )
         end
     end

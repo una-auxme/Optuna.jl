@@ -63,10 +63,11 @@ end
 
 nthreads = Threads.nthreads()
 if nthreads == 1
-    @warn """Mulththreading tests running on single thread."""
+    @warn "Mulththreading tests running on single thread."
 else
-    @info """Multithreading tests running on $(nthreads) threads " * 
-    "($(Threads.nthreads(:interactive)) interactive), main thread is $(Threads.threadid())."""
+    @info "Multithreading tests running on $(nthreads) threads " *
+        "($(Threads.nthreads(:interactive)) interactive), " *
+        "main thread is $(Threads.threadid())."
 end
 
 # Step 5: Optimize the study

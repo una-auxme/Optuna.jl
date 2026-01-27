@@ -129,7 +129,7 @@ Copy a study from one storage backend to another.
 ## Arguments
 - `from_study_name::String`: Name of the study to copy.
 - `from_storage::BaseStorage`: Storage backend to copy the study from. (see [Storage](@ref))
-- `to_storage::BaseStorage`: Storage backend to copy the study to. (see [Storage](@ref))   
+- `to_storage::BaseStorage`: Storage backend to copy the study to. (see [Storage](@ref))
 - `to_study_name::String=""`: Name of the new study. If empty, the original study name is used.
 """
 function copy_study(
@@ -147,16 +147,19 @@ function copy_study(
 end
 
 """
-    ask(study)
+    ask(study::Study)
 
 Wrapper for the Optuna `ask` function [ToDo: link URL].
 This function is safe for multithreading.
 
-# Arguments 
-- `study::Study` the study to ask.
+## Arguments
+- `study::Study`: The study to ask the trial from. (see [Study](@ref))
 
-# Keyowords
+## Keywords
 - `multithreading::Bool` if multithreading is used, default is automatically detected (true if more than one thread is available)
+
+## Returns
+- `Trial`: The new trial. (see [Trial](@ref))
 """
 function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
     if multithreading
