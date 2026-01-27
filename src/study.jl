@@ -4,7 +4,9 @@
 #
 
 """
-    This data structure represents an Optuna study and its corresponding artifact and data storage. A study is a collection of trials that share the same optimization objective.
+    Study(study, artifact_stpre, storage)
+
+This data structure represents an Optuna study and its corresponding artifact and data storage. A study is a collection of trials that share the same optimization objective.
 """
 struct Study
     study::Any
@@ -127,7 +129,7 @@ Copy a study from one storage backend to another.
 ## Arguments
 - `from_study_name::String`: Name of the study to copy.
 - `from_storage::BaseStorage`: Storage backend to copy the study from. (see [Storage](@ref))
-- `to_storage::BaseStorage`: Storage backend to copy the study to. (see [Storage](@ref))   
+- `to_storage::BaseStorage`: Storage backend to copy the study to. (see [Storage](@ref))
 - `to_study_name::String=""`: Name of the new study. If empty, the original study name is used.
 """
 function copy_study(
@@ -147,16 +149,26 @@ end
 """
     ask(study::Study)
 
-Get a new trial from the study. This is an alternative way to create trials instead of using the [optimize](@ref) function. A trial created this way must be completed using the [tell](@ref) function.
+Wrapper for the Optuna `ask` function [ToDo: link URL].
+This function is safe for multithreading.
 
 ## Arguments
-- `study::Study`: The study to get the trial from. (see [Study](@ref))
+- `study::Study`: The study to ask the trial from. (see [Study](@ref))
+
+## Keywords
+- `multithreading::Bool` if multithreading is used, default is automatically detected (true if more than one thread is available)
 
 ## Returns
 - `Trial`: The new trial. (see [Trial](@ref))
 """
-function ask(study::Study)
-    return Trial(study.study.ask())
+function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
+    if multithreading
+        thread_safe() do
+            return Trial{true}(study.study.ask())
+        end
+    else
+        return Trial{false}(study.study.ask())
+    end
 end
 
 """
@@ -172,19 +184,46 @@ Tell the study about the result of a trial. This is the proper way to complete a
 - `prune::Bool=false`: If true, the trial is pruned.
 """
 function tell(
-    study::Study, trial::Trial, score::Union{Nothing,T,Vector{T}}=nothing; prune::Bool=false
+    study::Study,
+    trial::Trial{false},
+    score::Union{Nothing,T,Vector{T}}=nothing;
+    prune::Bool=false,
 ) where {T<:AbstractFloat}
     if isnothing(score) && !prune
         throw(
             ArgumentError(
-                "th the score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
+                "The score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
             ),
         )
     end
+
     if prune
         study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
     else
         study.study.tell(trial.trial, score)
+    end
+end
+function tell(
+    study::Study,
+    trial::Trial{true},
+    score::Union{Nothing,T,Vector{T}}=nothing;
+    prune::Bool=false,
+    multithreading=Threads.threadid() != 1,
+) where {T<:AbstractFloat}
+    if isnothing(score) && !prune
+        throw(
+            ArgumentError(
+                "The score is nothing and prune is false. Either score must not be nothing or prune must be set to true.",
+            ),
+        )
+    end
+
+    thread_safe() do
+        if prune
+            study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
+        else
+            study.study.tell(trial.trial, score)
+        end
     end
 end
 
@@ -243,7 +282,7 @@ Upload an artifact for a given trial in the study. The artifact is a .jld2 file 
 - `trial::Trial`: The trial to associate the artifact with. (see [Trial](@ref))
 - `data::Dict`: The data to be stored as an artifact.
 """
-function upload_artifact(study::Study, trial::Trial, data::Dict)
+function upload_artifact(study::Study, trial::Trial{false}, data::Dict)
     artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
 
     JLD2.save(artifact_file, data)
@@ -256,6 +295,22 @@ function upload_artifact(study::Study, trial::Trial, data::Dict)
     trial.trial.set_user_attr("artifact_id", artifact_id)
 
     return rm(artifact_file)
+end
+function upload_artifact(study::Study, trial::Trial{true}, data::Dict)
+    artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
+
+    thread_safe() do
+        JLD2.save(artifact_file, data)
+        artifact_id = optuna.artifacts.upload_artifact(;
+            artifact_store=study.artifact_store.artifact_store,
+            file_path=artifact_file,
+            study_or_trial=trial.trial,
+            storage=study.storage.storage,
+        )
+        trial.trial.set_user_attr("artifact_id", artifact_id)
+
+        return rm(artifact_file)
+    end
 end
 
 """

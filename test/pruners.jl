@@ -4,7 +4,7 @@
 #
 
 function test_pruner(pruner::Optuna.BasePruner)
-    study, test_dir = create_test_study(pruner)
+    study, test_dir = create_test_study(; pruner=pruner)
 
     # complete trials to establish baseline
     for value in [1.0, 2.0, 3.0]
@@ -20,7 +20,9 @@ function test_pruner(pruner::Optuna.BasePruner)
     @test should_prune(trial) isa Bool
 
     tell(study, trial, 100.0)
-    rm(test_dir; recursive=true)
+
+    cleanup_test_study(study, test_dir)
+
     return nothing
 end
 
