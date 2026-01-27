@@ -35,8 +35,17 @@ function setup_test_study(;
     return study
 end
 
+include("utils.jl")
+
 @testset "Optuna.jl" begin
-    @testset "optimize" begin
+    include("pruners.jl")
+    include("samplers.jl")
+    include("storage.jl")
+    include("artifacts.jl")
+    include("trial.jl")
+    include("study.jl")
+    @testset "optimize" begin 
         include("optimize.jl")
     end
+    include("single_step.jl")
 end
