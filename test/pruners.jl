@@ -20,7 +20,6 @@ function test_pruner(pruner::Optuna.BasePruner)
     @test should_prune(trial) isa Bool
 
     tell(study, trial, 100.0)
-    rm(test_dir; recursive=true)
     return nothing
 end
 

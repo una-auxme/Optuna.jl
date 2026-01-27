@@ -19,7 +19,6 @@ function test_sampler(sampler::Optuna.BaseSampler)
 
         tell(study, trial, x + y)
     end
-    rm(test_dir; recursive=true)
     return nothing
 end
 
@@ -37,7 +36,6 @@ function test_sampler_reproducibility(sampler_constructor)
             push!(results, suggest_float(trial, "x", 0.0, 100.0))
             tell(study, trial, 1.0)
         end
-        rm(test_dir; recursive=true)
     end
 
     @test results1 == results2

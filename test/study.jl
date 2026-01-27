@@ -7,7 +7,6 @@
     @testset "Study construction" begin
         study, test_dir, _, _ = create_test_study(; name="construct_test")
         @test study isa Study
-        rm(test_dir; recursive=true)
     end
 
     @testset "Study direction" begin
@@ -16,14 +15,12 @@
             name="minimize_test", direction="minimize"
         )
         @test study isa Study
-        rm(test_dir; recursive=true)
 
         # maximize
         study, test_dir, _, _ = create_test_study(;
             name="maximize_test", direction="maximize"
         )
         @test study isa Study
-        rm(test_dir; recursive=true)
 
         # invalid direction should error
         @test_throws ErrorException create_test_study(;
@@ -39,8 +36,6 @@
 
         x = suggest_float(trial, "x", 0.0, 10.0)
         tell(study, trial, x)
-
-        rm(test_dir; recursive=true)
     end
 
     @testset "best_trial, best_params, best_value" begin
@@ -57,8 +52,6 @@
         @test best_value(study) isa Float64
         @test best_params(study) isa Dict{String,Any}
         @test best_trial(study) isa Trial
-
-        rm(test_dir; recursive=true)
     end
 
     @testset "load_study" begin
@@ -88,8 +81,6 @@
 
         delete_study("to_delete", storage)
         @test !("to_delete" in get_all_study_names(storage))
-
-        rm(test_dir; recursive=true)
     end
 
     @testset "copy_study" begin
@@ -107,8 +98,6 @@
         copy_study("original", storage1, storage2)
         study2 = load_study("original", storage2, artifacts)
         @test best_value(study2) == 99.0
-
-        rm(test_dir; recursive=true)
     end
 
     @testset "tell with prune" begin
@@ -120,7 +109,5 @@
         # pruned trial should not have a value, so best_value should error
         # (no completed trials)
         @test_throws Exception best_value(study)
-
-        rm(test_dir; recursive=true)
     end
 end
