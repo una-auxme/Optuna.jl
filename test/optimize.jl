@@ -43,6 +43,10 @@ end
 @testset "optimize" begin
     for verbose in (false, true)
         for n_jobs in (1, 4)
+            # skip multi-threaded tests if not enough threads available
+            if n_jobs > Threads.nthreads()
+                continue
+            end
             @testset "n_jobs=$(n_jobs), verbose=$(verbose)" begin
                 test_optimize_permutations(n_jobs, verbose)
             end
