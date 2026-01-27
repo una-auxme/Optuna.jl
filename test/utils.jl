@@ -40,3 +40,8 @@ function create_test_study(;
     )
     return study, path
 end
+
+function cleanup_test_study(study, test_dir)
+    # This is not necessary, because mktempdir cleans up automatically with process EOF. 
+    # rm(test_dir; recursive=true)
+end

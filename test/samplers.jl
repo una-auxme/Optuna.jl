@@ -4,7 +4,7 @@
 #
 
 function test_sampler(sampler::Optuna.BaseSampler)
-    study, test_dir = create_test_study(;sampler=sampler)
+    study, test_dir = create_test_study(; sampler=sampler)
 
     # run a few trials and verify parameter suggestions work
     for _ in 1:3
@@ -19,7 +19,9 @@ function test_sampler(sampler::Optuna.BaseSampler)
 
         tell(study, trial, x + y)
     end
-    rm(test_dir; recursive=true)
+
+    cleanup_test_study(study, test_dir)
+
     return nothing
 end
 
@@ -31,15 +33,15 @@ function test_sampler_reproducibility(sampler_constructor)
     seed = rand(UInt32)
     for (results, run) in [(results1, 1), (results2, 2)]
         sampler = sampler_constructor(seed)
-        study, test_dir = create_test_study(sampler; name="repro_test_$run")
+        study, test_dir = create_test_study(; sampler=sampler, study_name="repro_test_$run")
         for _ in 1:3
             trial = ask(study)
             push!(results, suggest_float(trial, "x", 0.0, 100.0))
             tell(study, trial, 1.0)
         end
-        rm(test_dir; recursive=true)
+        cleanup_test_study(study, test_dir)
     end
-
+    
     @test results1 == results2
     return nothing
 end

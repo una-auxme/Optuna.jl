@@ -27,25 +27,20 @@ end
 
 # Optimize the objective function of the study with a set of parameters suggested by the sampler
 function test_optimize_permutations(n_jobs, verbose)
-    study, test_dir = create_test_study()
+    study, test_dir = create_test_study(; study_name="optimize-$(n_jobs)-$(verbose)")
 
-    obj = function(trial; x, y, z)
+    obj = function (trial; x, y, z)
         objective(study, trial; x=x, y=y, z=z)
     end
 
-    optimize(
-        study,
-        obj,
-        (x=x_i, y=y_i, z=z_i);
-        n_trials=10,
-        n_jobs=n_jobs,
-        verbose=verbose,
-    )
+    optimize(study, obj, (x=x_i, y=y_i, z=z_i); n_trials=10, n_jobs=n_jobs, verbose=verbose)
 
-    rm(test_dir; recursive=true)
+    #@test best_value(study) < 0.0
+
+    cleanup_test_study(study, test_dir)
 end
 
-@testset "optimize" begin 
+@testset "optimize" begin
     for verbose in (false, true)
         for n_jobs in (1, 4)
             @testset "n_jobs=$(n_jobs), verbose=$(verbose)" begin
