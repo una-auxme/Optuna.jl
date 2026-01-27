@@ -82,7 +82,7 @@ function objective(trial::Trial, params::NamedTuple)
 end
 
 # Step 5: Optimize the objective function of the study with a set of parameters suggested by the sampler
-optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=10, n_jobs=1)
+optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=10, n_jobs=1, verbose=true)
 
 # Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))

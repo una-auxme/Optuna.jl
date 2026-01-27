@@ -32,9 +32,10 @@ function optimize(
     n_jobs::Integer=1,
 )
     @assert n_jobs > 0 "`optimize` is called with keyword `n_jobs=$(n_jobs)`, this doesn't make any sense."
-    @assert n_jobs <= Threads.nthreads() "`optimize` is called with keyword `n_jobs=$(n_jobs)`, but process only provides $(Threads.nthreads()) threads."
+    @assert n_jobs == 1 || n_jobs <= Threads.nthreads() "`optimize` is called with keyword `n_jobs=$(n_jobs)`, but process only provides $(Threads.nthreads()) threads."
+    @assert n_jobs == 1 || Threads.nthreads(:interactive) == 1 "`optimize` is called with keyword `n_jobs=$(n_jobs)`, therefore we require exactly one interactive thread. The number of interactive threads is `$(Threads.nthreads(:interactive))`."
 
-    if n_jobs < Threads.nthreads()
+    if n_jobs > 1 && n_jobs < Threads.nthreads()
         @warn "`optimize` is called with keyword `n_jobs=$(n_jobs)`, however, $(Threads.nthreads()) are allocated. All threads will be used for calculation."
     end
 
@@ -109,8 +110,6 @@ function optimize_multithreading(
     n_trials=100::Int,
     verbose::Bool=false,
 )
-    @assert Threads.nthreads(:interactive) == 1 "`optimize` is called with keyword `n_jobs=$(n_jobs)`, therefore we require exactly one interactive thread. The number of interactive threads is `$(Threads.nthreads(:interactive))`."
-
     PythonCall.GIL.unlock() do
         Threads.@threads for i in 1:n_trials
             if verbose
