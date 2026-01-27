@@ -3,6 +3,4 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-@testset "storage" begin
-
-end
+@testset "storage" begin end

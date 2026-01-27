@@ -3,6 +3,4 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-@testset "single_step" begin
-
-end
+@testset "single_step" begin end
