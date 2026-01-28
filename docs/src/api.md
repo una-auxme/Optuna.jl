@@ -25,6 +25,13 @@ RandomSampler
 
 ```@docs
 MedianPruner
+NopPruner
+PatientPruner
+PercentilePruner
+SuccessiveHalvingPruner
+HyperbandPruner
+ThresholdPruner
+WilcoxonPruner
 ```
 
 ## Study
