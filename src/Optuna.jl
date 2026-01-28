@@ -42,7 +42,7 @@ export MedianPruner
 # samplers.jl
 export RandomSampler
 # storage.jl
-export RDBStorage
+export RDBStorage, InMemoryStorage
 # artifacts.jl
 export FileSystemArtifactStore, ArtifactMeta
 # trial.jl

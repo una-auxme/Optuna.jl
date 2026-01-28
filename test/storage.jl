@@ -14,6 +14,13 @@
         @test storage.storage !== nothing
     end
 
+    @testset "InMemoryStorage" begin
+        storage = InMemoryStorage()
+        @test storage isa InMemoryStorage
+        @test storage isa Optuna.BaseStorage
+        @test storage.storage !== nothing
+    end
+
     @testset "sqlite" begin
         @testset "get_all_study_names" begin
             test_dir = mktempdir()
