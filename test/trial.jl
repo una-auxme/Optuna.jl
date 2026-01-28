@@ -19,6 +19,21 @@
         x2 = suggest_int(trial, "x", typemin(Int), typemax(Int))
         @test x == x2
 
+        z1 = suggest_int(trial, "z1", -100, 100; step=10)
+        @test z1 isa Int
+        @test z1 % 10 == 0
+
+        z2 = suggest_int(trial, "z2", 1, 100; log=true)
+        @test z2 isa Int
+        @test 1 <= z2 <= 100
+
+        # low < 1 throws an error
+        @test_throws Optuna.PythonCall.PyException suggest_int(
+            trial, "err1", -100, 100; log=true
+        )
+        # step and log cannot be used at the same time
+        @test_throws AssertionError suggest_int(trial, "err2", 10, 100; step=10, log=true)
+
         tell(study, trial, 1.0)
     end
 
@@ -36,6 +51,23 @@
         # same name returns same value
         y2 = suggest_float(trial, "y", 1e-100, 1e100)
         @test y == y2
+
+        z1 = suggest_float(trial, "z1", -100.0, 100.0; step=10.0)
+        @test z1 isa Float64
+        @test z1 % 10.0 == 0.0
+
+        z2 = suggest_float(trial, "z2", 1.0, 1e100; log=true)
+        @test z2 isa Float64
+        @test 1.0 <= z2 <= 1e100
+
+        # low <= 0 throws an error
+        @test_throws Optuna.PythonCall.PyException suggest_float(
+            trial, "err1", 0.0, 1e100; log=true
+        )
+        # step and log cannot be used at the same time
+        @test_throws AssertionError suggest_float(
+            trial, "err2", 1.0, 1e100; step=10.0, log=true
+        )
 
         tell(study, trial, 1.0)
     end

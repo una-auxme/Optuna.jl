@@ -26,12 +26,20 @@ Suggest an integer value for the given parameter name within the specified range
 ## Returns
 - `T`: Suggested integer value.
 """
-function suggest_int(trial::Trial{false}, name::String, low::T, high::T) where {T<:Signed}
-    return pyconvert(T, trial.trial.suggest_int(name, low, high))
+function suggest_int(
+    trial::Trial{false}, name::String, low::T, high::T; step::T=1, log::Bool=false
+) where {T<:Signed}
+    @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
+        "at the same time when suggesting an integer."
+    return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
 end
-function suggest_int(trial::Trial{true}, name::String, low::T, high::T) where {T<:Signed}
+function suggest_int(
+    trial::Trial{true}, name::String, low::T, high::T; step::T=1, log::Bool=false
+) where {T<:Signed}
+    @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
+        "at the same time when suggesting an integer."
     thread_safe() do
-        return pyconvert(T, trial.trial.suggest_int(name, low, high))
+        return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
     end
 end
 
@@ -50,15 +58,29 @@ Suggest a float value for the given parameter name within the specified range.
 - `T`: Suggested float value.
 """
 function suggest_float(
-    trial::Trial{false}, name::String, low::T, high::T
+    trial::Trial{false},
+    name::String,
+    low::T,
+    high::T;
+    step::Union{Nothing,T}=nothing,
+    log::Bool=false,
 ) where {T<:AbstractFloat}
-    return pyconvert(T, trial.trial.suggest_float(name, low, high))
+    @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
+        "at the same time when suggesting a float."
+    return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
 end
 function suggest_float(
-    trial::Trial{true}, name::String, low::T, high::T
+    trial::Trial{true},
+    name::String,
+    low::T,
+    high::T;
+    step::Union{Nothing,T}=nothing,
+    log::Bool=false,
 ) where {T<:AbstractFloat}
+    @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
+        "at the same time when suggesting a float."
     thread_safe() do
-        return pyconvert(T, trial.trial.suggest_float(name, low, high))
+        return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
     end
 end
 
