@@ -15,7 +15,7 @@ artifact_path = "examples/artifacts"
 
 # parameter search space for int(x_i), float(y_i), categorical(z_i) data
 x_i = [0, 100]
-y_i = [-10.0f0, 10.0f0]
+y_i = [-10.0, 10.0]
 z_i = [true, false]
 param = 5.0
 
