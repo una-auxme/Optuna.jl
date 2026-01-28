@@ -4,8 +4,10 @@
 
 ```@docs
 RDBStorage
+InMemoryStorage
 get_all_study_names
 ```
+
 ## Artifacts
 
 ```@docs
