@@ -16,5 +16,6 @@ include("utils.jl")
     include("trial.jl")
     include("study.jl")
     include("optimize.jl")
+    include("optimize_multithreading.jl")
     include("single_step.jl")
 end

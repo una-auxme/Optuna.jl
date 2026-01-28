@@ -34,7 +34,6 @@
             trial = ask(study)
             x = suggest_int(trial, "x", x_i[1], x_i[2])
             y = suggest_float(trial, "y", y_i[1], y_i[2])
-            println(y)
             z = suggest_categorical(trial, "z", z_i)
             score = objective(study, trial; x=x, y=y, z=z)
             if isnothing(score)
@@ -54,7 +53,6 @@
 
         @test best_x isa Int
         @test best_y isa Float64
-        println("best y: $best_y")
         @test best_z isa Bool
         best_obj = best_z ? best_x * (best_y - param) : best_x * (best_y + param)
         @test best_value(study) == best_obj
