@@ -19,6 +19,18 @@ ArtifactMeta
 RandomSampler
 ```
 
+```@docs
+TPESampler
+```
+
+```@docs
+GPSampler
+```
+
+```@docs
+GridSampler
+```
+
 ## Pruner
 
 ```@docs

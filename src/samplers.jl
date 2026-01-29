@@ -9,7 +9,7 @@
 abstract type BaseSampler end
 
 """
-    RandomSampler(seed=nothing::Union{Nothing,Int})
+    RandomSampler(seed=nothing::Union{Nothing,Integer})
 
 An independent sampler that samples randomly.
 For further information see the [RandomSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna-samplers-randomsampler) in the Optuna python documentation.
