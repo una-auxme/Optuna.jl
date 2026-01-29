@@ -189,6 +189,14 @@ end
 
 A Quasi Monte Carlo Sampler that generates low-discrepancy sequences.
 For further information see the [QMCSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.QMCSampler.html#optuna-samplers-qmcsampler) in the Optuna python documentation.
+
+## Keywords
+- `qmc_type::String` (default="sobol"): Type of QMC sequence to use (for example, `"sobol"` or `"halton"`).
+- `scramble::Bool` (default=false): Whether to scramble the QMC sequence to improve uniformity.
+- `seed::Union{Nothing,Integer}`: Seed for the random number generator (default=nothing).
+- `independent_sampler::Union{Nothing,BaseSampler}`: Independent sampler to use for parameters or cases not handled by the QMC sequence (default=nothing).
+- `warn_asynchronous_seeding::Bool` (default=true): Whether to emit a warning when using a fixed seed in asynchronous optimization.
+- `warn_independent_sampling::Bool` (default=true): Whether to emit a warning when falling back to the independent sampler.
 """
 struct QMCSampler <: BaseSampler
     sampler::Any
