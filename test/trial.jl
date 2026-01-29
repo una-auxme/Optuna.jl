@@ -61,6 +61,11 @@
         @test i64 isa Int
         @test -10000 <= i64 <= 10000
 
+        # Test with Int8 bounds and Int step - should work and return Int
+        i8_step = suggest_int(trial, "i8_step", Int8(-20), Int8(20); step=2)
+        @test i8_step isa Int
+        @test i8_step % 2 == 0
+
         tell(study, trial, 1.0)
     end
 
@@ -103,11 +108,24 @@
         study, test_dir = create_test_study(; study_name="suggest_float32_test")
         trial = ask(study)
 
-        # Test with Float32 bounds - should return Float64 and warn
-        @test_logs (:warn, "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation.") begin
+        # Test with Float32 bounds - should return Float64 and warn (only once per parameter)
+        local f32
+        @test_logs (:warn, "Float32 bounds provided to suggest_float for parameter 'f32'. Return type will be Float64 to match Optuna's internal representation.") begin
             f32 = suggest_float(trial, "f32", Float32(-1.0), Float32(1.0))
             @test f32 isa Float64
             @test -1.0 <= f32 <= 1.0
+        end
+
+        # Call same parameter again - should not warn (returns same value)
+        f32_2 = suggest_float(trial, "f32", Float32(-1.0), Float32(1.0))
+        @test f32_2 isa Float64
+        @test f32_2 == f32  # Same parameter returns same value
+
+        # Test with Float32 bounds and Float32 step - should work and warn once
+        @test_logs (:warn, "Float32 bounds provided to suggest_float for parameter 'f32_step'. Return type will be Float64 to match Optuna's internal representation.") begin
+            f32_step = suggest_float(trial, "f32_step", Float32(-10.0), Float32(10.0); step=Float32(2.0))
+            @test f32_step isa Float64
+            @test f32_step % 2.0 == 0.0
         end
 
         # Test with Float64 bounds - should return Float64 without warning

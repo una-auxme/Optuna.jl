@@ -3,6 +3,9 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+# Track which parameters have already been warned about for Float32 bounds
+const _warned_float32_params = Set{String}()
+
 """
     Trial(trial)
 
@@ -76,8 +79,9 @@ function suggest_float(
 ) where {T<:AbstractFloat}
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
-    if T == Float32
-        @warn "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation."
+    if T == Float32 && !(name in _warned_float32_params)
+        @warn "Float32 bounds provided to suggest_float for parameter '$name'. Return type will be Float64 to match Optuna's internal representation."
+        push!(_warned_float32_params, name)
     end
     return pyconvert(Float64, trial.trial.suggest_float(name, low, high; step=step, log=log))
 end
@@ -91,8 +95,9 @@ function suggest_float(
 ) where {T<:AbstractFloat}
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
-    if T == Float32
-        @warn "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation."
+    if T == Float32 && !(name in _warned_float32_params)
+        @warn "Float32 bounds provided to suggest_float for parameter '$name'. Return type will be Float64 to match Optuna's internal representation."
+        push!(_warned_float32_params, name)
     end
     thread_safe() do
         return pyconvert(Float64, trial.trial.suggest_float(name, low, high; step=step, log=log))
