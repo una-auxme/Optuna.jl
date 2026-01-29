@@ -84,7 +84,14 @@ end
     GPSampler(; ...)
 
 Sampler using Gaussian process-based Bayesian optimization.
-For further information and keywords see the [GPSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GPSampler.html#optuna-samplers-gpsampler) in the Optuna python documentation.
+For further information see the [GPSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GPSampler.html#optuna-samplers-gpsampler) in the Optuna python documentation.
+
+## Keywords
+- `seed::Union{Nothing,Integer}`: Seed for the random number generator (default=nothing).
+- `independent_sampler::Union{Nothing,BaseSampler}`: Sampler used for independent sampling when needed (default=nothing).
+- `n_startup_trials::Int`: Number of initial trials before Gaussian process-based optimization is used (default=10).
+- `deterministic_objective::Bool`: Whether the objective function is assumed to be deterministic (default=false).
+- `warn_independent_sampling::Bool`: Whether to show warnings when independent sampling is performed (default=true).
 """
 struct GPSampler <: BaseSampler
     sampler::Any
