@@ -40,3 +40,17 @@ function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
         )
     end
 end
+
+function convert_seed(seed::Integer)
+    try
+        return convert(UInt32, seed)
+    catch e
+        if e isa InexactError
+            throw(ArgumentError("Can't convert seed $(seed) to UInt32: $(e)"))
+        else
+            rethrow(e)
+        end
+    end
+end
+convert_seed(seed::UInt32) = seed
+convert_seed(::Nothing) = PythonCall.pybuiltins.None

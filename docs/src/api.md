@@ -34,6 +34,42 @@ ArtifactMeta
 RandomSampler
 ```
 
+```@docs
+TPESampler
+```
+
+```@docs
+GPSampler
+```
+
+```@docs
+CmaEsSampler
+```
+
+```@docs
+NSGAIISampler
+```
+
+```@docs
+NSGAIIISampler
+```
+
+```@docs
+GridSampler
+```
+
+```@docs
+QMCSampler
+```
+
+```@docs
+BruteForceSampler
+```
+
+```@docs
+PartialFixedSampler
+```
+
 ## Pruner
 
 ```@docs

@@ -43,7 +43,16 @@ include("optimize.jl")
 export MedianPruner, NopPruner, PatientPruner, PercentilePruner
 export SuccessiveHalvingPruner, HyperbandPruner, ThresholdPruner, WilcoxonPruner
 # samplers.jl
-export RandomSampler
+export RandomSampler,
+    TPESampler,
+    GPSampler,
+    CmaEsSampler,
+    NSGAIISampler,
+    NSGAIIISampler,
+    GridSampler,
+    QMCSampler,
+    BruteForceSampler,
+    PartialFixedSampler
 # journal.jl
 export JournalFileSymlinkLock, JournalFileOpenLock, JournalFileBackend, JournalRedisBackend
 # storage.jl
