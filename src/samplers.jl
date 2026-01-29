@@ -55,8 +55,8 @@ struct TPESampler <: BaseSampler
         prior_weight::Float64=1.0,
         consider_magic_clip::Bool=true,
         consider_endpoints::Bool=false,
-        n_startup_trials::Int=10,
-        n_ei_candidates::Int=24,
+        n_startup_trials::Integer=10,
+        n_ei_candidates::Integer=24,
         seed::Union{Nothing,Integer}=nothing,
         multivariate::Bool=false,
         group::Bool=false,
@@ -93,7 +93,7 @@ struct GPSampler <: BaseSampler
     function GPSampler(;
         seed::Union{Nothing,Integer}=nothing,
         independent_sampler::Union{Nothing,BaseSampler}=nothing,
-        n_startup_trials::Int=10,
+        n_startup_trials::Integer=10,
         deterministic_objective::Bool=false,
         warn_independent_sampling::Bool=true,
     )
