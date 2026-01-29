@@ -145,7 +145,7 @@ function create_mysql_url(;
 end
 
 """
-    create_redis_url(; user_name::String, password::String, host::String, port::String, database_name::String, query::Dict{String,Any})
+    create_redis_url(; user_name::String, password::String, host::String, port::String, database_index::String, query::Dict{String,Any})
 
 Returns a valid URL for a Redis server with the given arguments.
 
@@ -154,7 +154,7 @@ Returns a valid URL for a Redis server with the given arguments.
 - `password::String`: Password of the Redis user.
 - `host::String`: Host where the Redis server is running.
 - `port::String`: Port of the Redis server.
-- `database_name::String`: Index of the database.
+- `database_index::String`: Index of the database.
 
 ## Returns
 - `String`: URL to the Redis database.
@@ -180,8 +180,8 @@ function create_redis_url(;
         port = ":$port"
     end
     if !isempty(database_index)
-        db_idx = "/$database_index"
+        database_index = "/$database_index"
     end
 
-    return "redis://$user_string$host$port$db_idx"
+    return "redis://$user_string$host$port$database_index"
 end

@@ -4,7 +4,7 @@
 #
 
 """
-    add_conda_pkg()
+    add_conda_pkg(pkg_name::String; version::Union{Nothing,String})
 
 Test if the given package with the given version is installed and adds it to the conda environment if not.
 Julia needs to be restarted in order to use the newly installed package.
