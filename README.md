@@ -16,14 +16,14 @@ This package is based on the Python API that is provided by Preferred Networks, 
 
 1. Open the Jula REPL. Type `]` to open the package manager.
 2. Install Optuna
-```@julia
+```julia
     pkg> add Optuna
 ```
 3. Examples for hyperparameter optimization are provided in the [examples folder](https://github.com/una-auxme/Optuna.jl/tree/main/examples). You can also refer to the [documentation](https://una-auxme.github.io/Optuna.jl/dev/overview) for further information.
 
 ## How to use Optuna.jl
 The purest way to set up a hyperparameter optimization is shown in the following. For more advanced topics - like storing artifacts, multithreading, and more - see the [examples folder](https://github.com/una-auxme/Optuna.jl/tree/main/examples).
-```@julia
+```julia
 using Optuna
 
 # central database storage for all studies
