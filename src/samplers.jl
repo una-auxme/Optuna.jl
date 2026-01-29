@@ -250,6 +250,10 @@ end
 Sampler with partially fixed parameters.
 
 For further information see the [PartialFixedSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.PartialFixedSampler.html#optuna-samplers-partialfixedsampler) in the Optuna python documentation.
+
+## Arguments
+- `fixed_params::Dict{String,Vector}`: Dictionary of parameter names to fixed values. Parameters listed here will be fixed to the given values during sampling.
+- `base_sampler::BaseSampler`: Underlying sampler used to sample parameters that are not fixed in `fixed_params`.
 """
 struct PartialFixedSampler <: BaseSampler
     sampler::Any
