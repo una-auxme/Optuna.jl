@@ -22,7 +22,7 @@ struct JournalFileSymlinkLock <: BaseJournalFileLock
 end
 
 """
-    JournalFileSymlinkLock(file_path::String, grace_period::Union{Nothing,Int})
+    JournalFileOpenLock(file_path::String, grace_period::Union{Nothing,Int})
 
 Lock class for synchronizing processes for NFSv3 or later.
 
