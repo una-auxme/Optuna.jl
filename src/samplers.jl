@@ -225,6 +225,10 @@ Sampler using brute force.
 
 This sampler performs exhaustive search on the defined search space.
 For further information see the [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna-samplers-bruteforcesampler) in the Optuna python documentation.
+
+## Arguments
+- `seed::Union{Nothing,Integer}=nothing`: Seed for the random number generator.
+- `avoid_premature_stop::Bool=false`: If true, avoids stopping trials prematurely.
 """
 struct BruteForceSampler <: BaseSampler
     sampler::Any
