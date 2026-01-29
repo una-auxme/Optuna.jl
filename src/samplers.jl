@@ -49,7 +49,7 @@ struct TPESampler <: BaseSampler
     sampler::Any
 
     # ToDo: Add kwargs gamma=<function default_gamma>, weights=<function default_weights>, 
-    # ToDo: Add kwarf functions constraints_func=nothing, categorical_distance_func=nothing,
+    # ToDo: Add kwarg functions constraints_func=nothing, categorical_distance_func=nothing,
     function TPESampler(;
         consider_prior::Bool=true,
         prior_weight::Float64=1.0,
@@ -189,6 +189,14 @@ end
 
 A Quasi Monte Carlo Sampler that generates low-discrepancy sequences.
 For further information see the [QMCSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.QMCSampler.html#optuna-samplers-qmcsampler) in the Optuna python documentation.
+
+## Keywords
+- `qmc_type::String` (default="sobol"): Type of QMC sequence to use (for example, `"sobol"` or `"halton"`).
+- `scramble::Bool` (default=false): Whether to scramble the QMC sequence to improve uniformity.
+- `seed::Union{Nothing,Integer}`: Seed for the random number generator (default=nothing).
+- `independent_sampler::Union{Nothing,BaseSampler}`: Independent sampler to use for parameters or cases not handled by the QMC sequence (default=nothing).
+- `warn_asynchronous_seeding::Bool` (default=true): Whether to emit a warning when using a fixed seed in asynchronous optimization.
+- `warn_independent_sampling::Bool` (default=true): Whether to emit a warning when falling back to the independent sampler.
 """
 struct QMCSampler <: BaseSampler
     sampler::Any
@@ -225,6 +233,10 @@ Sampler using brute force.
 
 This sampler performs exhaustive search on the defined search space.
 For further information see the [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna-samplers-bruteforcesampler) in the Optuna python documentation.
+
+## Arguments
+- `seed::Union{Nothing,Integer}=nothing`: Seed for the random number generator.
+- `avoid_premature_stop::Bool=false`: If true, avoids stopping trials prematurely.
 """
 struct BruteForceSampler <: BaseSampler
     sampler::Any
@@ -246,6 +258,10 @@ end
 Sampler with partially fixed parameters.
 
 For further information see the [PartialFixedSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.PartialFixedSampler.html#optuna-samplers-partialfixedsampler) in the Optuna python documentation.
+
+## Arguments
+- `fixed_params::Dict{String,Vector}`: Dictionary of parameter names to fixed values. Parameters listed here will be fixed to the given values during sampling.
+- `base_sampler::BaseSampler`: Underlying sampler used to sample parameters that are not fixed in `fixed_params`.
 """
 struct PartialFixedSampler <: BaseSampler
     sampler::Any
