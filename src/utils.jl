@@ -7,8 +7,12 @@
 function convert_seed(seed::Integer)
     try
         return convert(UInt32, seed)
-    catch
-        @assert false "Can't convert seed $(seed)!"
+    catch e
+        if e isa InexactError
+            throw(ArgumentError("Can't convert seed $(seed) to UInt32: $(e)"))
+        else
+            rethrow(e)
+        end
     end
 end
 convert_seed(seed::UInt32) = seed
