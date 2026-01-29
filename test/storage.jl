@@ -21,7 +21,17 @@
         @test storage.storage !== nothing
     end
 
-    @testset "sqlite" begin
+    @testset "JournalStorage" begin
+        test_dir = mktempdir()
+        storage = JournalStorage(
+            JournalFileBackend(joinpath(test_dir, "journal_storage.log"))
+        )
+        @test storage isa JournalStorage
+        @test storage isa Optuna.BaseStorage
+        @test storage.storage !== nothing
+    end
+
+    @testset "SQLite" begin
         @testset "get_all_study_names" begin
             test_dir = mktempdir()
             storage = RDBStorage(create_sqlite_url(test_dir, "names_test"))
