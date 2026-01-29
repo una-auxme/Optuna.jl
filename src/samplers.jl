@@ -9,19 +9,18 @@
 abstract type BaseSampler end
 
 """
-    RandomSampler(seed=nothing::Union{Nothing,UInt32})
+    RandomSampler(seed=nothing::Union{Nothing,Int})
 
-An independent sampler that samples randomly
+An independent sampler that samples randomly.
+For further information see the [RandomSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna-samplers-randomsampler) in the Optuna python documentation.
 
 ## Arguments
-- `seed::Union{Nothing,UInt32}=nothing`: Seed for the random number generator.
+- `seed::Union{Nothing,Integer}=nothing`: Seed for the random number generator.
 """
 struct RandomSampler <: BaseSampler
     sampler::Any
 
-    # Notice: UInt32 is not in line with the Python docu, but we get an error message for signed ints from Python!
-    # See issue: #30
-    function RandomSampler(seed::Union{Nothing,UInt32}=nothing)
+    function RandomSampler(seed::Union{Nothing,Integer}=nothing)
         sampler = optuna.samplers.RandomSampler(convert_seed(seed))
         return new(sampler)
     end
@@ -31,7 +30,7 @@ end
     TPESampler(; ...)
 
 Sampler using TPE (Tree-structured Parzen Estimator) algorithm.
-For further information see the [TPESampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html) in the Optuna python documentation.
+For further information see the [TPESampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html#optuna-samplers-tpesampler) in the Optuna python documentation.
 
 ## Keywords
 - `consider_prior::Bool` (default=true).
@@ -40,7 +39,7 @@ For further information see the [TPESampler](https://optuna.readthedocs.io/en/st
 - `consider_endpoints::Bool` (default=false).
 - `n_startup_trials::Integer` (default=10).
 - `n_ei_candidates::Integer` (default=24).
-- `seed::Union{Nothing,UInt32}`: Seed for the random number generator (default=nothing).
+- `seed::Union{Nothing,Integer}`: Seed for the random number generator (default=nothing).
 - `multivariate::Bool` (default=false).
 - `group::Bool` (default=false).
 - `warn_independent_sampling::Bool` (default=true).
@@ -58,7 +57,7 @@ struct TPESampler <: BaseSampler
         consider_endpoints::Bool=false,
         n_startup_trials::Int=10,
         n_ei_candidates::Int=24,
-        seed::Union{Nothing,UInt32}=nothing,
+        seed::Union{Nothing,Integer}=nothing,
         multivariate::Bool=false,
         group::Bool=false,
         warn_independent_sampling::Bool=true,
@@ -92,7 +91,7 @@ struct GPSampler <: BaseSampler
 
     # ToDo: Add constraints_func=None, independent_sampler=nothing,
     function GPSampler(;
-        seed::Union{Nothing,UInt32}=nothing,
+        seed::Union{Nothing,Integer}=nothing,
         n_startup_trials::Int=10,
         deterministic_objective::Bool=false,
         warn_independent_sampling::Bool=true,
@@ -103,6 +102,25 @@ struct GPSampler <: BaseSampler
             deterministic_objective=deterministic_objective,
             warn_independent_sampling=warn_independent_sampling,
         )
+        return new(sampler)
+    end
+end
+
+"""
+    GridSampler(search_space, seed)
+
+Sampler using grid search.
+For further information see the [GridSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GridSampler.html#optuna-samplers-gridsampler) in the Optuna python documentation.
+
+## Arguments
+- `search_space::NamedTuple`
+- `seed::Union{Nothing,Integer}=nothing`: Seed for the random number generator.
+"""
+struct GridSampler <: BaseSampler
+    sampler::Any
+
+    function GridSampler(search_space::Any, seed::Union{Nothing,Integer}=nothing)
+        sampler = optuna.samplers.GridSampler(PyDict(search_space), convert_seed(seed))
         return new(sampler)
     end
 end

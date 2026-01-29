@@ -41,7 +41,7 @@ include("optimize.jl")
 # pruners.jl
 export MedianPruner
 # samplers.jl
-export RandomSampler
+export RandomSampler, TPESampler, GPSampler, GridSampler
 # storage.jl
 export RDBStorage
 # artifacts.jl

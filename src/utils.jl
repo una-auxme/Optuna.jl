@@ -4,5 +4,12 @@
 #
 
 # helpers
-convert_seed(seed::Int) = seed
+function convert_seed(seed::Integer)
+    try
+        return convert(UInt32, seed)
+    catch
+        @assert false "Can't convert seed $(seed)!"
+    end
+end
+convert_seed(seed::UInt32) = seed
 convert_seed(::Nothing) = PythonCall.pybuiltins.None

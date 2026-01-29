@@ -33,6 +33,7 @@ function test_sampler_reproducibility(sampler_constructor)
     seed = rand(UInt32)
     for (results, run) in [(results1, 1), (results2, 2)]
         sampler = sampler_constructor(seed)
+
         study, test_dir = create_test_study(; sampler=sampler, study_name="repro_test_$run")
         for _ in 1:3
             trial = ask(study)
@@ -51,6 +52,35 @@ end
         sampler = RandomSampler(42)
         @test sampler isa RandomSampler
         test_sampler(sampler)
+
         test_sampler_reproducibility(RandomSampler)
+    end
+
+    @testset "TPESampler" begin
+        sampler = TPESampler(; seed=42)
+        @test sampler isa TPESampler
+        test_sampler(sampler)
+
+        constructor(seed) = TPESampler(; seed=seed)
+        test_sampler_reproducibility(constructor)
+    end
+
+    @testset "GPSampler" begin
+        sampler = GPSampler(; seed=42)
+        @test sampler isa GPSampler
+        test_sampler(sampler)
+
+        constructor(seed) = GPSampler(; seed=seed)
+        test_sampler_reproducibility(constructor)
+    end
+
+    @testset "GridSampler" begin
+        search_space = Dict("x" => [0.0, 1.0, 10.0], "y" => [1, 5, 100], "z" => ["a", "b"])
+        sampler = GridSampler(search_space, 42)
+        @test sampler isa GridSampler
+        test_sampler(sampler)
+
+        constructor(seed) = GridSampler(search_space, seed)
+        test_sampler_reproducibility(constructor)
     end
 end
