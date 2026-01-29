@@ -20,8 +20,8 @@ function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
     dtoml = CondaPkg.read_deps(; file=dfile)
     pkgs, _, _ = CondaPkg.parse_deps(dtoml)
 
-    pkg_string = isnothing(version) ? "$pkg_name@v$version" : "$pkg_name"
-    if !any(pkg -> if isnoting(version)
+    pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
+    if !any(pkg -> if isnothing(version)
         pkg.name == pkg_string
     else
         "$(pkg.name)@v$(pkg.version)" == pkg_string
