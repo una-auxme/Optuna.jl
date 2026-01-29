@@ -55,10 +55,6 @@ BruteForceSampler
 PartialFixedSampler
 ```
 
-```@docs
-NSGAIISampler
-```
-
 ## Pruner
 
 ```@docs
