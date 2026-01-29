@@ -107,6 +107,57 @@ struct GPSampler <: BaseSampler
 end
 
 """
+    CmaEsSampler()
+
+A sampler using cmaes as the backend.
+
+For further information see the [CmaEsSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.CmaEsSampler.html#optuna-samplers-cmaessampler) in the Optuna python documentation.
+"""
+struct CmaEsSampler <: BaseSampler
+    sampler::Any
+
+    # ToDo: Implement!
+    function CmaEsSampler()
+        @assert false "`CmaEsSampler` not implemented yet. Please open an issue or PR."
+        return new(sampler)
+    end
+end
+
+"""
+    NSGAIISampler()
+
+Multi-objective sampler using the NSGA-II algorithm.
+
+For further information see the [NSGAIISampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.NSGAIISampler.html#optuna-samplers-nsgaiisampler) in the Optuna python documentation.
+"""
+struct NSGAIISampler <: BaseSampler
+    sampler::Any
+
+    # ToDo: Implement!
+    function NSGAIISampler()
+        @assert false "`NSGAIISampler` not implemented yet. Please open an issue or PR."
+        return new(sampler)
+    end
+end
+
+"""
+    NSGAIIISampler()
+
+Multi-objective sampler using the NSGA-III algorithm.
+
+For further information see the [NSGAIIISampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.NSGAIIISampler.html#optuna-samplers-nsgaiiisampler) in the Optuna python documentation.
+"""
+struct NSGAIIISampler <: BaseSampler
+    sampler::Any
+
+    # ToDo: Implement!
+    function NSGAIIISampler()
+        @assert false "`NSGAIIISampler` not implemented yet. Please open an issue or PR."
+        return new(sampler)
+    end
+end
+
+"""
     GridSampler(search_space, seed)
 
 Sampler using grid search.
@@ -121,6 +172,76 @@ struct GridSampler <: BaseSampler
 
     function GridSampler(search_space::Any, seed::Union{Nothing,Integer}=nothing)
         sampler = optuna.samplers.GridSampler(PyDict(search_space), convert_seed(seed))
+        return new(sampler)
+    end
+end
+
+"""
+    QMCSampler(; ...)
+
+A Quasi Monte Carlo Sampler that generates low-discrepancy sequences.
+For further information see the [QMCSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.QMCSampler.html#optuna-samplers-qmcsampler) in the Optuna python documentation.
+"""
+struct QMCSampler <: BaseSampler
+    sampler::Any
+
+    # ToDo: Implement keyword `independent_sampler=None`
+    function QMCSampler(;
+        qmc_type::String="sobol",
+        scramble::Bool=false,
+        seed::Union{Nothing,Integer}=nothing,
+        warn_asynchronous_seeding::Bool=true,
+        warn_independent_sampling::Bool=true,
+    )
+        sampler = optuna.samplers.QMCSampler(;
+            qmc_type=qmc_type,
+            scramble=scramble,
+            seed=convert_seed(seed),
+            warn_asynchronous_seeding=warn_asynchronous_seeding,
+            warn_independent_sampling=warn_independent_sampling,
+        )
+
+        return new(sampler)
+    end
+end
+
+"""
+    BruteForceSampler(seed, avoid_premature_stop)
+
+Sampler using brute force.
+
+This sampler performs exhaustive search on the defined search space.
+For further information see the [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna-samplers-bruteforcesampler) in the Optuna python documentation.
+"""
+struct BruteForceSampler <: BaseSampler
+    sampler::Any
+
+    function BruteForceSampler(
+        seed::Union{Nothing,Integer}=nothing, avoid_premature_stop::Bool=false
+    )
+        sampler = optuna.samplers.BruteForceSampler(
+            convert_seed(seed), avoid_premature_stop
+        )
+
+        return new(sampler)
+    end
+end
+
+"""
+    PartialFixedSampler(fixed_params, base_sampler)
+
+Sampler with partially fixed parameters.
+
+For further information see the [PartialFixedSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.PartialFixedSampler.html#optuna-samplers-partialfixedsampler) in the Optuna python documentation.
+"""
+struct PartialFixedSampler <: BaseSampler
+    sampler::Any
+
+    function PartialFixedSampler(fixed_params::Dict, base_sampler::BaseSampler)
+        sampler = optuna.samplers.PartialFixedSampler(
+            PyDict(fixed_params), base_sampler.sampler
+        )
+
         return new(sampler)
     end
 end

@@ -28,7 +28,35 @@ GPSampler
 ```
 
 ```@docs
+CmaEsSampler
+```
+
+```@docs
+NSGAIISampler
+```
+
+```@docs
+NSGAIIISampler
+```
+
+```@docs
 GridSampler
+```
+
+```@docs
+QMCSampler
+```
+
+```@docs
+BruteForceSampler
+```
+
+```@docs
+PartialFixedSampler
+```
+
+```@docs
+NSGAIISampler
 ```
 
 ## Pruner
