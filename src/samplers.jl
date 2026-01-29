@@ -276,7 +276,7 @@ struct PartialFixedSampler <: BaseSampler
     function PartialFixedSampler(
         fixed_params::Dict{String,Vector}, base_sampler::BaseSampler
     )
-        @warn "PartialFixedSampler depends on Scipy, which is not included with this package by default. To use PartialFixedSampler you would have to add it to the CondaPkg.toml"
+        @warn "PartialFixedSampler depends on Scipy, which is not included with this package by default. To use PartialFixedSampler you will need to add it to the CondaPkg.toml"
         sampler = optuna.samplers.PartialFixedSampler(
             PyDict(fixed_params), base_sampler.sampler
         )
