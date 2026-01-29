@@ -89,15 +89,21 @@ For further information and keywords see the [GPSampler](https://optuna.readthed
 struct GPSampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Add constraints_func=None, independent_sampler=nothing,
+    # ToDo: Add constraints_func=None
     function GPSampler(;
         seed::Union{Nothing,Integer}=nothing,
+        independent_sampler::Union{Nothing,BaseSampler}=nothing,
         n_startup_trials::Int=10,
         deterministic_objective::Bool=false,
         warn_independent_sampling::Bool=true,
     )
         sampler = optuna.samplers.GPSampler(;
             seed=convert_seed(seed),
+            independent_sampler=if isnothing(independent_sampler)
+                PythonCall.pybuiltins.None
+            else
+                independent_sampler.sampler
+            end,
             n_startup_trials=n_startup_trials,
             deterministic_objective=deterministic_objective,
             warn_independent_sampling=warn_independent_sampling,
@@ -164,13 +170,15 @@ Sampler using grid search.
 For further information see the [GridSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GridSampler.html#optuna-samplers-gridsampler) in the Optuna python documentation.
 
 ## Arguments
-- `search_space::NamedTuple`
+- `search_space::Dict{String, Vector}`
 - `seed::Union{Nothing,Integer}=nothing`: Seed for the random number generator.
 """
 struct GridSampler <: BaseSampler
     sampler::Any
 
-    function GridSampler(search_space::Any, seed::Union{Nothing,Integer}=nothing)
+    function GridSampler(
+        search_space::Dict{String,Vector}, seed::Union{Nothing,Integer}=nothing
+    )
         sampler = optuna.samplers.GridSampler(PyDict(search_space), convert_seed(seed))
         return new(sampler)
     end
@@ -185,11 +193,11 @@ For further information see the [QMCSampler](https://optuna.readthedocs.io/en/st
 struct QMCSampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Implement keyword `independent_sampler=None`
     function QMCSampler(;
         qmc_type::String="sobol",
         scramble::Bool=false,
         seed::Union{Nothing,Integer}=nothing,
+        independent_sampler::Union{Nothing,BaseSampler}=nothing,
         warn_asynchronous_seeding::Bool=true,
         warn_independent_sampling::Bool=true,
     )
@@ -197,6 +205,11 @@ struct QMCSampler <: BaseSampler
             qmc_type=qmc_type,
             scramble=scramble,
             seed=convert_seed(seed),
+            independent_sampler=if isnothing(independent_sampler)
+                PythonCall.pybuiltins.None
+            else
+                independent_sampler.sampler
+            end,
             warn_asynchronous_seeding=warn_asynchronous_seeding,
             warn_independent_sampling=warn_independent_sampling,
         )
@@ -237,7 +250,10 @@ For further information see the [PartialFixedSampler](https://optuna.readthedocs
 struct PartialFixedSampler <: BaseSampler
     sampler::Any
 
-    function PartialFixedSampler(fixed_params::Dict, base_sampler::BaseSampler)
+    function PartialFixedSampler(
+        fixed_params::Dict{String,Vector}, base_sampler::BaseSampler
+    )
+        @warn "PartialFixedSampler depends on Scipy, which is not included with this package by default. To use PartialFixedSampler you would have to add it to the CondaPkg.toml"
         sampler = optuna.samplers.PartialFixedSampler(
             PyDict(fixed_params), base_sampler.sampler
         )
