@@ -29,6 +29,7 @@ function thread_safe(f)
     return res
 end
 
+include("utils.jl")
 include("pruners.jl")
 include("samplers.jl")
 include("storage.jl")
@@ -41,7 +42,16 @@ include("optimize.jl")
 export MedianPruner, NopPruner, PatientPruner, PercentilePruner
 export SuccessiveHalvingPruner, HyperbandPruner, ThresholdPruner, WilcoxonPruner
 # samplers.jl
-export RandomSampler
+export RandomSampler,
+    TPESampler,
+    GPSampler,
+    CmaEsSampler,
+    NSGAIISampler,
+    NSGAIIISampler,
+    GridSampler,
+    QMCSampler,
+    BruteForceSampler,
+    PartialFixedSampler
 # storage.jl
 export RDBStorage, InMemoryStorage
 # artifacts.jl
