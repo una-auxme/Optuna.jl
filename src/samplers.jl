@@ -49,7 +49,7 @@ struct TPESampler <: BaseSampler
     sampler::Any
 
     # ToDo: Add kwargs gamma=<function default_gamma>, weights=<function default_weights>, 
-    # ToDo: Add kwarf functions constraints_func=nothing, categorical_distance_func=nothing,
+    # ToDo: Add kwarg functions constraints_func=nothing, categorical_distance_func=nothing,
     function TPESampler(;
         consider_prior::Bool=true,
         prior_weight::Float64=1.0,
