@@ -37,6 +37,33 @@
         tell(study, trial, 1.0)
     end
 
+    @testset "suggest_int with different integer types" begin
+        study, test_dir = create_test_study(; study_name="suggest_int_types_test")
+        trial = ask(study)
+
+        # Test with Int8 bounds - should still return Int
+        i8 = suggest_int(trial, "i8", Int8(-10), Int8(10))
+        @test i8 isa Int
+        @test -10 <= i8 <= 10
+
+        # Test with Int16 bounds - should still return Int
+        i16 = suggest_int(trial, "i16", Int16(-100), Int16(100))
+        @test i16 isa Int
+        @test -100 <= i16 <= 100
+
+        # Test with Int32 bounds - should still return Int
+        i32 = suggest_int(trial, "i32", Int32(-1000), Int32(1000))
+        @test i32 isa Int
+        @test -1000 <= i32 <= 1000
+
+        # Test with Int64 bounds - should return Int
+        i64 = suggest_int(trial, "i64", Int64(-10000), Int64(10000))
+        @test i64 isa Int
+        @test -10000 <= i64 <= 10000
+
+        tell(study, trial, 1.0)
+    end
+
     @testset "suggest_float" begin
         study, test_dir = create_test_study(; study_name="suggest_float_test")
         trial = ask(study)
@@ -68,6 +95,25 @@
         @test_throws AssertionError suggest_float(
             trial, "err2", 1.0, 1e100; step=10.0, log=true
         )
+
+        tell(study, trial, 1.0)
+    end
+
+    @testset "suggest_float with Float32 bounds" begin
+        study, test_dir = create_test_study(; study_name="suggest_float32_test")
+        trial = ask(study)
+
+        # Test with Float32 bounds - should return Float64 and warn
+        @test_logs (:warn, "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation.") begin
+            f32 = suggest_float(trial, "f32", Float32(-1.0), Float32(1.0))
+            @test f32 isa Float64
+            @test -1.0 <= f32 <= 1.0
+        end
+
+        # Test with Float64 bounds - should return Float64 without warning
+        f64 = suggest_float(trial, "f64", -10.0, 10.0)
+        @test f64 isa Float64
+        @test -10.0 <= f64 <= 10.0
 
         tell(study, trial, 1.0)
     end

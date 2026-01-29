@@ -24,22 +24,26 @@ Suggest an integer value for the given parameter name within the specified range
 - `high::T`: The upper bound of the range (inclusive).
 
 ## Returns
-- `T`: Suggested integer value.
+- `Int`: Suggested integer value. Always returns Int to match Optuna's internal representation.
+
+## Notes
+- Optuna uses Python integers internally. This function always returns Int 
+  to maintain consistency with `best_params()`.
 """
 function suggest_int(
-    trial::Trial{false}, name::String, low::T, high::T; step::T=1, log::Bool=false
+    trial::Trial{false}, name::String, low::T, high::T; step::Integer=1, log::Bool=false
 ) where {T<:Signed}
     @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting an integer."
-    return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
+    return pyconvert(Int, trial.trial.suggest_int(name, low, high; step=step, log=log))
 end
 function suggest_int(
-    trial::Trial{true}, name::String, low::T, high::T; step::T=1, log::Bool=false
+    trial::Trial{true}, name::String, low::T, high::T; step::Integer=1, log::Bool=false
 ) where {T<:Signed}
     @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting an integer."
     thread_safe() do
-        return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
+        return pyconvert(Int, trial.trial.suggest_int(name, low, high; step=step, log=log))
     end
 end
 
@@ -55,32 +59,43 @@ Suggest a float value for the given parameter name within the specified range.
 - `high::T`: The upper bound of the range (inclusive).
 
 ## Returns
-- `T`: Suggested float value.
+- `Float64`: Suggested float value. Always returns Float64 to match Optuna's internal representation.
+
+## Notes
+- Optuna uses Python floats (Float64) internally. This function always returns Float64 
+  to maintain consistency with `best_params()`.
+- A warning is issued if Float32 bounds are provided, as they will be converted to Float64.
 """
 function suggest_float(
     trial::Trial{false},
     name::String,
     low::T,
     high::T;
-    step::Union{Nothing,T}=nothing,
+    step::Union{Nothing,Real}=nothing,
     log::Bool=false,
 ) where {T<:AbstractFloat}
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
-    return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
+    if T == Float32
+        @warn "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation."
+    end
+    return pyconvert(Float64, trial.trial.suggest_float(name, low, high; step=step, log=log))
 end
 function suggest_float(
     trial::Trial{true},
     name::String,
     low::T,
     high::T;
-    step::Union{Nothing,T}=nothing,
+    step::Union{Nothing,Real}=nothing,
     log::Bool=false,
 ) where {T<:AbstractFloat}
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
+    if T == Float32
+        @warn "Float32 bounds provided to suggest_float. Return type will be Float64 to match Optuna's internal representation."
+    end
     thread_safe() do
-        return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
+        return pyconvert(Float64, trial.trial.suggest_float(name, low, high; step=step, log=log))
     end
 end
 
