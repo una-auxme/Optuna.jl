@@ -1,4 +1,3 @@
 [deps]
 mysqlclient = ">=2.2,<3"
 optuna = ">=4,<5"
-scipy = ">=1"
