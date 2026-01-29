@@ -24,9 +24,6 @@ function test_sampler(sampler::Optuna.BaseSampler; finite_search_space::Bool=fal
 
         tell(study, trial, x + y)
     end
-
-    cleanup_test_study(study, test_dir)
-
     return nothing
 end
 
@@ -45,7 +42,6 @@ function test_sampler_reproducibility(sampler_constructor)
             push!(results, suggest_int(trial, "y", 1, 100))
             tell(study, trial, 1.0)
         end
-        cleanup_test_study(study, test_dir)
     end
 
     @test results1 == results2

@@ -23,6 +23,19 @@ struct RDBStorage <: BaseStorage
 end
 
 """
+    InMemoryStorage()
+
+Storage class that stores data in memory of the running process.
+"""
+struct InMemoryStorage <: BaseStorage
+    storage::Any
+
+    function InMemoryStorage()
+        return new(optuna.storages.InMemoryStorage())
+    end
+end
+
+"""
     get_all_study_names(storage::BaseStorage)
 
 returns all study names stored in the given storage.

@@ -4,8 +4,10 @@
 
 ```@docs
 RDBStorage
+InMemoryStorage
 get_all_study_names
 ```
+
 ## Artifacts
 
 ```@docs
@@ -59,6 +61,13 @@ PartialFixedSampler
 
 ```@docs
 MedianPruner
+NopPruner
+PatientPruner
+PercentilePruner
+SuccessiveHalvingPruner
+HyperbandPruner
+ThresholdPruner
+WilcoxonPruner
 ```
 
 ## Study

@@ -39,7 +39,8 @@ include("study.jl")
 include("optimize.jl")
 
 # pruners.jl
-export MedianPruner
+export MedianPruner, NopPruner, PatientPruner, PercentilePruner
+export SuccessiveHalvingPruner, HyperbandPruner, ThresholdPruner, WilcoxonPruner
 # samplers.jl
 export RandomSampler,
     TPESampler,
@@ -52,7 +53,7 @@ export RandomSampler,
     BruteForceSampler,
     PartialFixedSampler
 # storage.jl
-export RDBStorage
+export RDBStorage, InMemoryStorage
 # artifacts.jl
 export FileSystemArtifactStore, ArtifactMeta
 # trial.jl
