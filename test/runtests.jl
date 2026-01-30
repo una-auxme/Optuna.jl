@@ -3,6 +3,10 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+using CondaPkg
+
+CondaPkg.add(["mysqlclient", "redis-py"])
+
 using Optuna
 using Test
 

@@ -117,7 +117,7 @@ function create_mysql_url(;
         error("No name of the MySQL database was provided.")
     end
 
-    if !isempty(user_name) && !isempty(password)
+    if !isempty(user_name)
         user_string = "$user_name:$password@"
     else
         user_string = ""
