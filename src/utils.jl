@@ -13,7 +13,7 @@ Julia needs to be restarted in order to use the newly installed package.
 - `pkg_name::String`: Name of the package.
 
 ## Keyword Arguments
-- `version::String`: Version of the package.
+- `version::Union{Nothing,String}`: Version of the package.
 """
 function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
     dfile = CondaPkg.cur_deps_file()

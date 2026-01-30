@@ -5,7 +5,8 @@
 
 using CondaPkg
 
-CondaPkg.add(["mysqlclient", "redis-py"])
+CondaPkg.add("mysqlclient"; version="2.2.*")
+CondaPkg.add("redis-py")
 
 using Optuna
 using Test
