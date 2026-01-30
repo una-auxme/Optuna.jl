@@ -10,7 +10,7 @@ services:
     command:
       --default-authentication-plugin=mysql_native_password
     healthcheck:
-      test: ["CMD", "mysql", "-u", "root", "-h", "localhost", "-P", "3306", "--silent", "--execute", "SELECT 1;"]
+      test: ["CMD", "mysql", "-u", "root", "-h", "127.0.0.1", "-P", "3306", "--silent", "--execute", "SELECT 1;"]
       interval: 5s
       timeout: 10s
       retries: 5
