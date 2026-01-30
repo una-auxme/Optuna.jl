@@ -92,7 +92,7 @@ end
                     run(`docker compose -f $compose_file up -d --wait`)
 
                     url = create_mysql_url(;
-                        host="localhost",
+                        host="127.0.0.1",
                         port="3306",
                         user_name="root",
                         database_name="optuna",
@@ -173,7 +173,7 @@ end
             else
                 @testset "Database access" begin
                     test_dir = mktempdir()
-                    url = create_redis_url(; host="localhost", user_name="root")
+                    url = create_redis_url(; host="127.0.0.1", user_name="root")
 
                     compose_file = joinpath(@__DIR__, "docker", "docker-compose-redis.yml")
                     run(`docker compose -f $compose_file up -d --wait`)
