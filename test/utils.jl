@@ -40,3 +40,10 @@ function create_test_study(;
     )
     return study, path
 end
+
+@testset "utils" begin
+    # Test package installation without version number
+    @test_throws ErrorException Optuna.add_conda_pkg("pytest")
+    # Test package installation without version number
+    @test_throws ErrorException Optuna.add_conda_pkg("pytest"; version=">=9,<10")
+end

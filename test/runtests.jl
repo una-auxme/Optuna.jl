@@ -12,9 +12,8 @@ CondaPkg.add("redis-py"; version=">=7,<8")
 using Optuna
 using Test
 
-include("utils.jl")
-
 @testset "Optuna.jl" begin
+    include("utils.jl")
     include("pruners.jl")
     include("samplers.jl")
     include("storage.jl")
