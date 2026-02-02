@@ -120,5 +120,6 @@ optimize
 ## Utils
 
 ```@docs
+is_conda_pkg_installed
 add_conda_pkg
 ```

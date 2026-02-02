@@ -6,8 +6,31 @@
 """
     add_conda_pkg(pkg_name::String; version::Union{Nothing,String})
 
-Test if the given package with the given version is installed and adds it to the conda environment if not.
-Julia needs to be restarted in order to use the newly installed package.
+Test if the given package with the given version is installed in the conda environment.
+
+## Arguments
+- `pkg_name::String`: Name of the package.
+
+## Keyword Arguments
+- `version::Union{Nothing,String}`: Version of the package.
+"""
+function is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String}=nothing)
+    dfile = CondaPkg.cur_deps_file()
+    dtoml = CondaPkg.read_deps(; file=dfile)
+    pkgs, _, _ = CondaPkg.parse_deps(dtoml)
+
+    pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
+    return any(pkg -> if isnothing(version)
+        pkg.name == pkg_string
+    else
+        "$(pkg.name)@v$(pkg.version)" == pkg_string
+    end, pkgs)
+end
+
+"""
+    add_conda_pkg(pkg_name::String; version::Union{Nothing,String})
+
+Adds the given package with the given version in the conda environment if it is not installed.
 
 ## Arguments
 - `pkg_name::String`: Name of the package.
@@ -16,16 +39,8 @@ Julia needs to be restarted in order to use the newly installed package.
 - `version::Union{Nothing,String}`: Version of the package.
 """
 function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
-    dfile = CondaPkg.cur_deps_file()
-    dtoml = CondaPkg.read_deps(; file=dfile)
-    pkgs, _, _ = CondaPkg.parse_deps(dtoml)
-
-    pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
-    if !any(pkg -> if isnothing(version)
-        pkg.name == pkg_string
-    else
-        "$(pkg.name)@v$(pkg.version)" == pkg_string
-    end, pkgs)
+    if !is_conda_pkg_installed(pkg_name; version=version)
+        pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
         @info "The package `$pkg_string` is required for this functionality. " *
             "Adding `$pkg_string` to the conda environment..."
         if isnothing(version)
@@ -33,11 +48,6 @@ function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
         else
             CondaPkg.add(pkg_name; version=version)
         end
-        throw(
-            ErrorException(
-                "You need to restart Julia to use the new `$pkg_string` package."
-            ),
-        )
     end
 end
 

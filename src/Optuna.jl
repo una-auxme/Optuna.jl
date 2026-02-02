@@ -67,7 +67,7 @@ export Study
 export TrialState
 
 # utils.jl
-export add_conda_pkg
+export is_conda_pkg_installed, add_conda_pkg
 # storage.jl
 export get_all_study_names, create_sqlite_url, create_mysql_url, create_redis_url
 # trial.jl

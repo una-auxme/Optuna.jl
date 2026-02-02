@@ -43,7 +43,9 @@ end
 
 @testset "utils" begin
     # Test package installation without version number
-    @test_throws ErrorException Optuna.add_conda_pkg("pytest")
-    # Test package installation without version number
-    @test_throws ErrorException Optuna.add_conda_pkg("pytest"; version=">=9,<10")
+    add_conda_pkg("pytest")
+    @test is_conda_pkg_installed("pytest")
+    # Test package installation with version number
+    add_conda_pkg("pytest"; version=">=9,<10")
+    @test is_conda_pkg_installed("pytest"; version=">=9,<10")
 end
