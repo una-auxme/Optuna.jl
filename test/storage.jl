@@ -175,6 +175,10 @@ end
             if !success(`docker --version`)
                 @warn "docker is not installed on this machine. " *
                     "Skipping Redis database access tests."
+            elseif Sys.iswindows() &&
+                strip(read(`docker info --format "{{".OSType"}}"`, String)) != "linux"
+                @warn "Your Windows is not configured for linux containers. " *
+                    "Skipping Redis database access tests."
             else
                 @testset "Database access" begin
                     test_dir = mktempdir()
