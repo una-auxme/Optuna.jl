@@ -17,7 +17,8 @@ struct RDBStorage <: BaseStorage
 
     function RDBStorage(url::String)
         if startswith(url, "mysql")
-            add_conda_pkg("mysqlclient")
+            add_conda_pkg("pymysql"; version=">=1,<2")
+            add_conda_pkg("cryptography"; version=">=46,<47")
         end
         storage = optuna.storages.RDBStorage(url)
         return new(storage)
@@ -141,7 +142,7 @@ function create_mysql_url(;
         query_string = "?$(query_string[1:(end - 1)])"
     end
 
-    return "mysql://$user_string$host$port/$database_name$query_string"
+    return "mysql+pymysql://$user_string$host$port/$database_name$query_string"
 end
 
 """

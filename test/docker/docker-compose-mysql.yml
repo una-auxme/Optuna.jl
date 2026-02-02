@@ -7,10 +7,10 @@ services:
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: true
       MYSQL_DATABASE: optuna
-    command:
-      --default-authentication-plugin=mysql_native_password
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
     healthcheck:
-      test: ["CMD", "mysql", "-u", "root", "-h", "127.0.0.1", "-P", "3306", "--silent", "--execute", "SELECT 1;"]
-      interval: 5s
-      timeout: 10s
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-utest", "-ptest"]
+      interval: 10s 
+      timeout: 5s
       retries: 5

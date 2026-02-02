@@ -79,7 +79,7 @@ struct JournalRedisBackend <: BaseJournalBackend
     backend::Any
 
     function JournalRedisBackend(url::String, use_cluster::Bool=false, prefix::String="")
-        add_conda_pkg("redis-py")
+        add_conda_pkg("redis-py"; version=">=7,<8")
         return new(optuna.storages.journal.JournalRedisBackend(url, use_cluster, prefix))
     end
 end

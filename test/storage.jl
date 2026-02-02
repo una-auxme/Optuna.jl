@@ -51,13 +51,13 @@ end
             @testset "create_mysql_url" begin
                 # basic url
                 url = create_mysql_url(; host="localhost", database_name="optuna")
-                @test url == "mysql://localhost/optuna"
+                @test url == "mysql+pymysql://localhost/optuna"
 
                 # with port
                 url2 = create_mysql_url(;
                     host="localhost", port="3306", database_name="optuna"
                 )
-                @test url2 == "mysql://localhost:3306/optuna"
+                @test url2 == "mysql+pymysql://localhost:3306/optuna"
 
                 # with credentials
                 url3 = create_mysql_url(;
@@ -66,7 +66,7 @@ end
                     host="localhost",
                     database_name="optuna",
                 )
-                @test url3 == "mysql://user:pass@localhost/optuna"
+                @test url3 == "mysql+pymysql://user:pass@localhost/optuna"
 
                 # with query params
                 url4 = create_mysql_url(;
@@ -74,7 +74,7 @@ end
                     database_name="optuna",
                     query=Dict{String,Any}("charset" => "utf8"),
                 )
-                @test url4 == "mysql://localhost/optuna?charset=utf8"
+                @test url4 == "mysql+pymysql://localhost/optuna?charset=utf8"
 
                 # missing host should error
                 @test_throws ErrorException create_mysql_url(; database_name="optuna")
@@ -86,15 +86,20 @@ end
             if !success(`docker --version`)
                 @warn "docker is not installed on this machine. " *
                     "Skipping MySQL database access tests."
+            elseif Sys.iswindows() &&
+                strip(read(`docker info --format "{{".OSType"}}"`, String)) != "linux"
+                @warn "Your Windows is not configured for linux containers. " *
+                    "Skipping MySQL database access tests."
             else
                 @testset "Database access" begin
                     compose_file = joinpath(@__DIR__, "docker", "docker-compose-mysql.yml")
                     run(`docker compose -f $compose_file up -d --wait`)
 
                     url = create_mysql_url(;
+                        user_name="test",
+                        password="test",
                         host="127.0.0.1",
                         port="3306",
-                        user_name="root",
                         database_name="optuna",
                     )
                     try
