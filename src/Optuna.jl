@@ -32,6 +32,7 @@ end
 include("utils.jl")
 include("pruners.jl")
 include("samplers.jl")
+include("journal.jl")
 include("storage.jl")
 include("artifacts.jl")
 include("trial.jl")
@@ -52,8 +53,10 @@ export RandomSampler,
     QMCSampler,
     BruteForceSampler,
     PartialFixedSampler
+# journal.jl
+export JournalFileSymlinkLock, JournalFileOpenLock, JournalFileBackend, JournalRedisBackend
 # storage.jl
-export RDBStorage, InMemoryStorage
+export RDBStorage, InMemoryStorage, JournalStorage
 # artifacts.jl
 export FileSystemArtifactStore, ArtifactMeta
 # trial.jl
@@ -63,8 +66,10 @@ export Study
 # optimize.jl
 export TrialState
 
+# utils.jl
+export is_conda_pkg_installed, add_conda_pkg
 # storage.jl
-export get_all_study_names, create_sqlite_url, create_mysql_url
+export get_all_study_names, create_sqlite_url, create_mysql_url, create_redis_url
 # trial.jl
 export suggest_int, suggest_float, suggest_categorical, report, should_prune
 # study.jl

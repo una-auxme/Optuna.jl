@@ -1,2 +1,3 @@
 [deps]
+CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

@@ -3,12 +3,18 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
+using CondaPkg
+
+CondaPkg.add("pymysql"; version=">=1,<2")
+CondaPkg.add("cryptography"; version=">=46,<47")
+CondaPkg.add("redis-py"; version=">=7,<8")
+CondaPkg.resolve(; force=true)
+
 using Optuna
 using Test
 
-include("utils.jl")
-
 @testset "Optuna.jl" begin
+    include("utils.jl")
     include("pruners.jl")
     include("samplers.jl")
     include("storage.jl")

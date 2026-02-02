@@ -5,7 +5,20 @@
 ```@docs
 RDBStorage
 InMemoryStorage
+JournalStorage
 get_all_study_names
+create_sqlite_url
+create_mysql_url
+create_redis_url
+```
+
+## Journal
+
+```@docs
+JournalFileBackend
+JournalRedisBackend
+JournalFileSymlinkLock
+JournalFileOpenLock
 ```
 
 ## Artifacts
@@ -102,4 +115,11 @@ should_prune
 
 ```@docs
 optimize
+```
+
+## Utils
+
+```@docs
+is_conda_pkg_installed
+add_conda_pkg
 ```
