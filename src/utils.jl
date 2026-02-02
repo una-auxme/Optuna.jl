@@ -4,7 +4,7 @@
 #
 
 """
-    add_conda_pkg(pkg_name::String; version::Union{Nothing,String})
+    is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String})
 
 Test if the given package with the given version is installed in the conda environment.
 
@@ -19,11 +19,11 @@ function is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String}
     dtoml = CondaPkg.read_deps(; file=dfile)
     pkgs, _, _ = CondaPkg.parse_deps(dtoml)
 
-    pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
+    pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name = \"$version\""
     return any(pkg -> if isnothing(version)
         pkg.name == pkg_string
     else
-        "$(pkg.name)@v$(pkg.version)" == pkg_string
+        "$pkg_name = \"$version\"" == pkg_string
     end, pkgs)
 end
 
@@ -40,7 +40,7 @@ Adds the given package with the given version in the conda environment if it is 
 """
 function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
     if !is_conda_pkg_installed(pkg_name; version=version)
-        pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name@v$version"
+        pkg_string = isnothing(version) ? "$pkg_name" : "$pkg_name = \"$version\""
         @info "The package `$pkg_string` is required for this functionality. " *
             "Adding `$pkg_string` to the conda environment..."
         if isnothing(version)
