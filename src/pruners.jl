@@ -3,8 +3,6 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-abstract type BasePruner end
-
 """
     MedianPruner(n_startup_trials::Int=5,
         n_warmup_steps::Int=0,

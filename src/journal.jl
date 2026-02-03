@@ -2,7 +2,6 @@
 # Copyright (c) 2026 Julian Trommer, Valentin Höpfner, Andreas Hofmann, Josef Kircher, Tobias Thummerer, and contributors
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
-abstract type BaseJournalFileLock end
 
 """
     JournalFileSymlinkLock(file_path::String, grace_period::Union{Nothing,Int})
@@ -37,8 +36,6 @@ struct JournalFileOpenLock <: BaseJournalFileLock
         return new(optuna.storages.journal.JournalFileOpenLock(file_path, grace_period))
     end
 end
-
-abstract type BaseJournalBackend end
 
 """
     JournalFileBackend(file_path::String; lock_obj::Union{Nothing,BaseJournalFileLock})
