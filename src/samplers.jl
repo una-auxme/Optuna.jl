@@ -4,11 +4,6 @@
 #
 
 """
-    BaseSampler is an abstract type for samplers.
-"""
-abstract type BaseSampler end
-
-"""
     RandomSampler(seed=nothing::Union{Nothing,Integer})
 
 An independent sampler that samples randomly.

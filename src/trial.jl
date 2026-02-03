@@ -4,15 +4,6 @@
 #
 
 """
-    Trial(trial)
-
-Trial is a data structure wrapper for an Optuna trial.
-"""
-struct Trial{multithreading}
-    trial::Any
-end
-
-"""
     suggest_int(trial::Trial, name::String, low::T, high::T) where {T<:Signed}
 
 Suggest an integer value for the given parameter name within the specified range.
