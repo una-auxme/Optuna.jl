@@ -217,7 +217,6 @@ end
         p_threshold::Float64=0.1,
         n_startup_steps::Int=2)
 
-WilcoxonPruner depends on Scipy, which isnt shipped with this package by default. 
 Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon signed-rank test between the current trial and the current best trial, and stops whenever the pruner is sure up to a given p-value that the current trial is worse than the best one.
 
 ## Arguments
@@ -227,7 +226,7 @@ Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon
 struct WilcoxonPruner <: BasePruner
     pruner::Any
     function WilcoxonPruner(; p_threshold::Float64=0.1, n_startup_steps::Int=2)
-        @warn "WilcoxonPruner depends on Scipy.stats, which is not included with this package by default. To use WilcoxonPruner you would have to add it to the CondaPkg.toml"
+        add_conda_pkg("scipy"; version=">=1,<2")
         pruner = optuna.pruners.WilcoxonPruner(;
             p_threshold=p_threshold, n_startup_steps=n_startup_steps
         )
