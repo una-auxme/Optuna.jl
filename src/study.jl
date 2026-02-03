@@ -57,8 +57,8 @@ function Study(
     study = optuna.create_study(;
         storage=storage.storage,
         study_name=study_name,
-        sampler=isnothing(sampler) ? PythonCall.pybuiltins.None : sampler.sampler,
-        pruner=isnothing(pruner) ? PythonCall.pybuiltins.None : pruner.pruner,
+        sampler=isnothing(sampler) ? nothing : sampler.sampler,
+        pruner=isnothing(pruner) ? nothing : pruner.pruner,
         direction=direction,
         load_if_exists=load_if_exists,
     )
@@ -142,7 +142,7 @@ function copy_study(
         from_study_name=from_study_name,
         from_storage=from_storage.storage,
         to_storage=to_storage.storage,
-        to_study_name=isempty(to_study_name) ? PythonCall.pybuiltins.None : to_study_name,
+        to_study_name=isempty(to_study_name) ? nothing : to_study_name,
     )
 end
 

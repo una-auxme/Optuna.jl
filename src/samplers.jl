@@ -107,7 +107,7 @@ struct GPSampler <: BaseSampler
         sampler = optuna.samplers.GPSampler(;
             seed=convert_seed(seed),
             independent_sampler=if isnothing(independent_sampler)
-                PythonCall.pybuiltins.None
+                nothing
             else
                 independent_sampler.sampler
             end,
@@ -221,7 +221,7 @@ struct QMCSampler <: BaseSampler
             scramble=scramble,
             seed=convert_seed(seed),
             independent_sampler=if isnothing(independent_sampler)
-                PythonCall.pybuiltins.None
+                nothing
             else
                 independent_sampler.sampler
             end,

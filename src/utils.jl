@@ -23,7 +23,7 @@ function is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String}
     return any(pkg -> if isnothing(version)
         pkg.name == pkg_string
     else
-        "$pkg_name = \"$version\"" == pkg_string
+        "$(pkg.name) = \"$version\"" == pkg_string
     end, pkgs)
 end
 
@@ -48,6 +48,7 @@ function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
         else
             CondaPkg.add(pkg_name; version=version)
         end
+        CondaPkg.resolve(; force=true)
     end
 end
 
@@ -63,4 +64,4 @@ function convert_seed(seed::Integer)
     end
 end
 convert_seed(seed::UInt32) = seed
-convert_seed(::Nothing) = PythonCall.pybuiltins.None
+convert_seed(::Nothing) = nothing

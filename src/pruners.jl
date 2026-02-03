@@ -67,8 +67,7 @@ struct PatientPruner <: BasePruner
     function PatientPruner(
         wrapped_pruner::Union{BasePruner,Nothing}, patience::Int; min_delta::Float64=0.0
     )
-        py_wrapped =
-            isnothing(wrapped_pruner) ? PythonCall.pybuiltins.None : wrapped_pruner.pruner
+        py_wrapped = isnothing(wrapped_pruner) ? nothing : wrapped_pruner.pruner
         pruner = optuna.pruners.PatientPruner(py_wrapped, patience; min_delta=min_delta)
         return new(pruner)
     end
@@ -203,11 +202,9 @@ struct ThresholdPruner <: BasePruner
         n_warmup_steps::Int=0,
         interval_steps::Int=1,
     )
-        py_lower = isnothing(lower) ? PythonCall.pybuiltins.None : lower
-        py_upper = isnothing(upper) ? PythonCall.pybuiltins.None : upper
         pruner = optuna.pruners.ThresholdPruner(;
-            lower=py_lower,
-            upper=py_upper,
+            lower=lower,
+            upper=upper,
             n_warmup_steps=n_warmup_steps,
             interval_steps=interval_steps,
         )
