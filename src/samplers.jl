@@ -69,32 +69,23 @@ struct TPESampler <: BaseSampler
         constraints_func::Union{Nothing,Function}=nothing,
         categorical_distance_func::Union{Nothing,Function}=nothing,
     )
-        kwargs = Dict{Symbol,Any}(
-            pairs((;
-                consider_prior,
-                prior_weight,
-                consider_magic_clip,
-                consider_endpoints,
-                n_startup_trials,
-                n_ei_candidates,
-                seed,
-                multivariate,
-                group,
-                warn_independent_sampling,
-                constant_liar,
-                constraints_func,
-                categorical_distance_func,
-            )),
+        sampler = optuna.samplers.TPESampler(;
+            consider_prior=consider_prior,
+            prior_weight=prior_weight,
+            consider_magic_clip=consider_magic_clip,
+            consider_endpoints=consider_endpoints,
+            n_startup_trials=n_startup_trials,
+            n_ei_candidates=n_ei_candidates,
+            gamma=isnothing(gamma) ? nothing : gamma,
+            weights=isnothing(weights) ? nothing : weights,
+            seed=convert_seed(seed),
+            multivariate=multivariate,
+            group=group,
+            warn_independent_sampling=warn_independent_sampling,
+            constant_liar=constant_liar,
+            constraints_func=constraints_func,
+            categorical_distance_func=categorical_distance_func,
         )
-        kwargs[:seed] = convert_seed(kwargs[:seed])
-        if !isnothing(gamma)
-            kwargs[:gamma] = gamma
-        end
-        if !isnothing(weights)
-            kwargs[:weights] = weights
-        end
-
-        sampler = optuna.samplers.TPESampler(; kwargs...)
         return new(sampler)
     end
 end
