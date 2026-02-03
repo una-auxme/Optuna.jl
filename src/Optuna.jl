@@ -31,11 +31,11 @@ end
 
 include("utils.jl")
 include("pruners.jl")
-include("samplers.jl")
 include("journal.jl")
 include("storage.jl")
 include("artifacts.jl")
 include("trial.jl")
+include("samplers.jl")
 include("study.jl")
 include("optimize.jl")
 

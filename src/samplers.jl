@@ -39,17 +39,19 @@ For further information see the [TPESampler](https://optuna.readthedocs.io/en/st
 - `consider_endpoints::Bool` (default=false).
 - `n_startup_trials::Integer` (default=10).
 - `n_ei_candidates::Integer` (default=24).
+- `gamma::Union{Nothing,Function}` If nothing defaults to: https://github.com/optuna/optuna/blob/c2b3361c053805b1e80cd1b811230419af198766/optuna/samplers/_tpe/sampler.py#L53
+- `weights::Union{Nothing,Function}` If nothing defaults to: https://github.com/optuna/optuna/blob/c2b3361c053805b1e80cd1b811230419af198766/optuna/samplers/_tpe/sampler.py#L61
 - `seed::Union{Nothing,Integer}`: Seed for the random number generator (default=nothing).
 - `multivariate::Bool` (default=false).
 - `group::Bool` (default=false).
 - `warn_independent_sampling::Bool` (default=true).
 - `constant_liar::Bool` (default=false).
+- `constraints_func::Union{Nothing,Function}` (default=nothing).
+- `categorical_distance_func::Union{Nothing,Function}` (default=nothing).
 """
 struct TPESampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Add kwargs gamma=<function default_gamma>, weights=<function default_weights>, 
-    # ToDo: Add kwarg functions constraints_func=nothing, categorical_distance_func=nothing,
     function TPESampler(;
         consider_prior::Bool=true,
         prior_weight::Float64=1.0,
@@ -57,25 +59,42 @@ struct TPESampler <: BaseSampler
         consider_endpoints::Bool=false,
         n_startup_trials::Integer=10,
         n_ei_candidates::Integer=24,
+        gamma::Union{Nothing,Function}=nothing,
+        weights::Union{Nothing,Function}=nothing,
         seed::Union{Nothing,Integer}=nothing,
         multivariate::Bool=false,
         group::Bool=false,
         warn_independent_sampling::Bool=true,
         constant_liar::Bool=false,
+        constraints_func::Union{Nothing,Function}=nothing,
+        categorical_distance_func::Union{Nothing,Function}=nothing,
     )
-        sampler = optuna.samplers.TPESampler(;
-            consider_prior=consider_prior,
-            prior_weight=prior_weight,
-            consider_magic_clip=consider_magic_clip,
-            consider_endpoints=consider_endpoints,
-            n_startup_trials=n_startup_trials,
-            n_ei_candidates=n_ei_candidates,
-            seed=convert_seed(seed),
-            multivariate=multivariate,
-            group=group,
-            warn_independent_sampling=warn_independent_sampling,
-            constant_liar=constant_liar,
+        kwargs = Dict{Symbol,Any}(
+            pairs((;
+                consider_prior,
+                prior_weight,
+                consider_magic_clip,
+                consider_endpoints,
+                n_startup_trials,
+                n_ei_candidates,
+                seed,
+                multivariate,
+                group,
+                warn_independent_sampling,
+                constant_liar,
+                constraints_func,
+                categorical_distance_func,
+            )),
         )
+        kwargs[:seed] = convert_seed(kwargs[:seed])
+        if !isnothing(gamma)
+            kwargs[:gamma] = gamma
+        end
+        if !isnothing(weights)
+            kwargs[:weights] = weights
+        end
+
+        sampler = optuna.samplers.TPESampler(; kwargs...)
         return new(sampler)
     end
 end
@@ -91,17 +110,18 @@ For further information see the [GPSampler](https://optuna.readthedocs.io/en/sta
 - `independent_sampler::Union{Nothing,BaseSampler}`: Sampler used for independent sampling when needed (default=nothing).
 - `n_startup_trials::Int`: Number of initial trials before Gaussian process-based optimization is used (default=10).
 - `deterministic_objective::Bool`: Whether the objective function is assumed to be deterministic (default=false).
+- `constraints_func::Union{Nothing,Function}`: An optional function that computes the objective constraints (default=nothing).
 - `warn_independent_sampling::Bool`: Whether to show warnings when independent sampling is performed (default=true).
 """
 struct GPSampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Add constraints_func=None
     function GPSampler(;
         seed::Union{Nothing,Integer}=nothing,
         independent_sampler::Union{Nothing,BaseSampler}=nothing,
         n_startup_trials::Integer=10,
         deterministic_objective::Bool=false,
+        constraints_func::Union{Nothing,Function}=nothing,
         warn_independent_sampling::Bool=true,
     )
         sampler = optuna.samplers.GPSampler(;
@@ -112,6 +132,7 @@ struct GPSampler <: BaseSampler
                 independent_sampler.sampler
             end,
             n_startup_trials=n_startup_trials,
+            constraints_func=constraints_func,
             deterministic_objective=deterministic_objective,
             warn_independent_sampling=warn_independent_sampling,
         )
@@ -129,9 +150,40 @@ For further information see the [CmaEsSampler](https://optuna.readthedocs.io/en/
 struct CmaEsSampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Implement!
-    function CmaEsSampler()
-        @assert false "`CmaEsSampler` not implemented yet. Please open an issue or PR."
+    # TODO: Check that the source trials are frozen
+    function CmaEsSampler(
+        x0::Union{Nothing,Dict{String,Any}}=nothing,
+        sigma0::Union{Nothing,Float64}=nothing,
+        n_startup_trials::Int=1,
+        independent_sampler::Union{Nothing,BaseSampler}=nothing,
+        warn_independent_sampling::Bool=true,
+        seed::Union{Nothing,Integer}=nothing;
+        consider_pruned_trials::Bool=false,
+        restart_strategy::Union{Nothing,String}=nothing,
+        popsize::Union{Nothing,Integer}=nothing,
+        inc_popsize::Int=-1,
+        use_separable_cma::Bool=false,
+        with_margin::Bool=false,
+        lr_adapt::Bool=false,
+        source_trials::Union{Nothing,Vector{Trial}}=nothing,
+    )
+        add_conda_pkg("cmaes"; version=">=0.12,<1")
+        sampler = optuna.samplers.CmaEsSampler(
+            x0,
+            sigma0,
+            n_startup_trials,
+            isnothing(independent_sampler) ? nothing : independent_sampler.sampler,
+            warn_independent_sampling,
+            convert_seed(seed);
+            consider_pruned_trials=consider_pruned_trials,
+            restart_strategy=restart_strategy,
+            popsize=popsize,
+            inc_popsize=inc_popsize,
+            use_separable_cma=use_separable_cma,
+            with_margin=with_margin,
+            lr_adapt=lr_adapt,
+            source_trials=source_trials,
+        )
         return new(sampler)
     end
 end
@@ -146,9 +198,31 @@ For further information see the [NSGAIISampler](https://optuna.readthedocs.io/en
 struct NSGAIISampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Implement!
-    function NSGAIISampler()
-        @assert false "`NSGAIISampler` not implemented yet. Please open an issue or PR."
+    # TODO: crossover is a class in optuna
+    function NSGAIISampler(;
+        population_size::Int=50,
+        mutation_prob::Union{Nothing,Float64}=nothing,
+        crossover::Nothing=nothing,
+        crossover_prob::Float64=0.9,
+        swapping_prob::Float64=0.5,
+        seed::Union{Nothing,Integer}=nothing,
+        constraints_func::Union{Nothing,Function}=nothing,
+        elite_population_selection_strategy::Union{Nothing,Function}=nothing,
+        child_generation_strategy::Union{Nothing,Function}=nothing,
+        after_trial_strategy::Union{Nothing,Function}=nothing,
+    )
+        sampler = optuna.samplers.NSGAIISampler(;
+            population_size=population_size,
+            mutation_prob=mutation_prob,
+            crossover=crossover,
+            crossover_prob=crossover_prob,
+            swapping_prob=swapping_prob,
+            seed=seed,
+            constraints_func=constraints_func,
+            elite_population_selection_strategy=elite_population_selection_strategy,
+            child_generation_strategy=child_generation_strategy,
+            after_trial_strategy=after_trial_strategy,
+        )
         return new(sampler)
     end
 end
@@ -163,9 +237,34 @@ For further information see the [NSGAIIISampler](https://optuna.readthedocs.io/e
 struct NSGAIIISampler <: BaseSampler
     sampler::Any
 
-    # ToDo: Implement!
-    function NSGAIIISampler()
-        @assert false "`NSGAIIISampler` not implemented yet. Please open an issue or PR."
+    function NSGAIIISampler(;
+        population_size::Int=50,
+        mutation_prob::Union{Nothing,Float64}=nothing,
+        crossover::Nothing=nothing,
+        crossover_prob::Float64=0.9,
+        swapping_prob::Float64=0.5,
+        seed::Union{Nothing,Integer}=nothing,
+        constraints_func::Union{Nothing,Function}=nothing,
+        reference_points::Union{Nothing,AbstractArray{T,2}}=nothing,
+        dividing_parameter::Int=3,
+        elite_population_selection_strategy::Union{Nothing,Function}=nothing,
+        child_generation_strategy::Union{Nothing,Function}=nothing,
+        after_trial_strategy::Union{Nothing,Function}=nothing,
+    ) where {T}
+        sampler = optuna.samplers.NSGAIIISampler(;
+            population_size=population_size,
+            mutation_prob=mutation_prob,
+            crossover=crossover,
+            crossover_prob=crossover_prob,
+            swapping_prob=swapping_prob,
+            seed=seed,
+            constraints_func=constraints_func,
+            reference_points=reference_points,
+            dividing_parameter=dividing_parameter,
+            elite_population_selection_strategy=elite_population_selection_strategy,
+            child_generation_strategy=child_generation_strategy,
+            after_trial_strategy=after_trial_strategy,
+        )
         return new(sampler)
     end
 end
@@ -267,18 +366,16 @@ Sampler with partially fixed parameters.
 For further information see the [PartialFixedSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.PartialFixedSampler.html#optuna-samplers-partialfixedsampler) in the Optuna python documentation.
 
 ## Arguments
-- `fixed_params::Dict{String,Vector}`: Dictionary of parameter names to fixed values. Parameters listed here will be fixed to the given values during sampling.
+- `fixed_params::Dict{String,Any}`: Dictionary of parameter names to fixed values. Parameters listed here will be fixed to the given values during sampling.
 - `base_sampler::BaseSampler`: Underlying sampler used to sample parameters that are not fixed in `fixed_params`.
 """
 struct PartialFixedSampler <: BaseSampler
     sampler::Any
 
-    function PartialFixedSampler(
-        fixed_params::Dict{String,Vector}, base_sampler::BaseSampler
-    )
-        @warn "PartialFixedSampler depends on Scipy, which is not included with this package by default. To use PartialFixedSampler you will need to add it to the CondaPkg.toml"
+    function PartialFixedSampler(fixed_params::Dict{String,Any}, base_sampler::BaseSampler)
+        add_conda_pkg("scipy"; version=">=1,<2")
         sampler = optuna.samplers.PartialFixedSampler(
-            PyDict(fixed_params), base_sampler.sampler
+            PyDict{String,Any}(fixed_params), base_sampler.sampler
         )
 
         return new(sampler)
