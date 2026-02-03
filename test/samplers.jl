@@ -65,27 +65,28 @@ end
         constructor(seed) = TPESampler(; seed=seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
         # TODO: Test constraints_func and categorical_distance_func
-        function gamma(x::Integer)
-            return min(math.ceil(0.1 * x), 25)
-        end
-        function weights(x::Integer)
-            if x == 0
-                return Float64[]
-            elseif x < 25
-                return ones(x)
-            else
-                ramp = range(1.0 / x, 1.0; length=x - 25)
-                flat = ones(25)
-                return vcat(collect(ramp), flat)
+        @testset "kwargs" begin
+            function gamma(x::Integer)
+                return min(math.ceil(0.1 * x), 25)
             end
-        end
-        sampler = TPESampler(; seed=42, gamma=gamma, weights=weights)
-        test_sampler(sampler)
+            function weights(x::Integer)
+                if x == 0
+                    return Float64[]
+                elseif x < 25
+                    return ones(x)
+                else
+                    ramp = range(1.0 / x, 1.0; length=x - 25)
+                    flat = ones(25)
+                    return vcat(collect(ramp), flat)
+                end
+            end
+            sampler = TPESampler(; seed=42, gamma=gamma, weights=weights)
+            test_sampler(sampler)
 
-        constructor(seed) = TPESampler(; seed=seed, gamma=gamma, weights=weights)
-        test_sampler_reproducibility(constructor)
+            constructor_kwargs(seed) = TPESampler(; seed=seed, gamma=gamma, weights=weights)
+            test_sampler_reproducibility(constructor_kwargs)
+        end
     end
 
     @testset "GPSampler" begin
@@ -96,13 +97,15 @@ end
         constructor(seed) = GPSampler(; seed=seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
         # TODO: Test constraints_func
-        sampler = GPSampler(; seed=42, independent_sampler=RandomSampler(42))
-        test_sampler(sampler)
+        @testset "kwargs" begin
+            sampler = GPSampler(; seed=42, independent_sampler=RandomSampler(42))
+            test_sampler(sampler)
 
-        constructor(seed) = GPSampler(; seed=seed, independent_sampler=RandomSampler(seed))
-        test_sampler_reproducibility(constructor)
+            constructor_kwargs(seed) =
+                GPSampler(; seed=seed, independent_sampler=RandomSampler(seed))
+            test_sampler_reproducibility(constructor_kwargs)
+        end
     end
 
     @testset "CmaEsSampler" begin
@@ -113,31 +116,32 @@ end
         constructor(seed) = CmaEsSampler(nothing, nothing, 1, nothing, true, seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
         # TODO Test source_trials
-        sampler = CmaEsSampler(
-            Dict{String,Any}("x" => 5.0, "y" => 5, "z" => ["a"]),
-            0.1,
-            1,
-            RandomSampler(42),
-            true,
-            42;
-            restart_strategy="ipop",
-            popsize=50,
-        )
-        test_sampler(sampler)
+        @testset "kwargs" begin
+            sampler = CmaEsSampler(
+                Dict{String,Any}("x" => 5.0, "y" => 5, "z" => ["a"]),
+                0.1,
+                1,
+                RandomSampler(42),
+                true,
+                42;
+                restart_strategy="ipop",
+                popsize=50,
+            )
+            test_sampler(sampler)
 
-        constructor(seed) = CmaEsSampler(
-            Dict{String,Any}("x" => 5.0, "y" => 5, "z" => ["a"]),
-            0.1,
-            1,
-            RandomSampler(seed),
-            true,
-            seed;
-            restart_strategy="ipop",
-            popsize=50,
-        )
-        test_sampler_reproducibility(constructor)
+            constructor_kwargs(seed) = CmaEsSampler(
+                Dict{String,Any}("x" => 5.0, "y" => 5, "z" => ["a"]),
+                0.1,
+                1,
+                RandomSampler(seed),
+                true,
+                seed;
+                restart_strategy="ipop",
+                popsize=50,
+            )
+            test_sampler_reproducibility(constructor_kwargs)
+        end
     end
 
     @testset "NSGAIISampler" begin
@@ -148,14 +152,28 @@ end
         constructor(seed) = NSGAIISampler(; seed=seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
-        # TODO: Test crossover, constraints_func, elite_population_selection_strategy,
+        # TODO: Test constraints_func, elite_population_selection_strategy,
         #       child_generation_strategy, after_trial_strategy
-        sampler = NSGAIISampler(; mutation_prob=0.9, seed=42)
-        test_sampler(sampler)
+        @testset "kwargs with Crossover" begin
+            for crossover in [
+                UniformCrossover(),
+                BLXAlphaCrossover(),
+                SPXCrossover(),
+                SBXCrossover(),
+                VSBXCrossover(),
+                UNDXCrossover(),
+            ]
+                sampler = NSGAIISampler(; mutation_prob=0.9, crossover=crossover, seed=42)
+                test_sampler(sampler)
 
-        constructor(seed) = NSGAIISampler(; mutation_prob=0.9, seed=seed)
-        test_sampler_reproducibility(constructor)
+                function constructor_kwargs(seed)
+                    return NSGAIISampler(;
+                        mutation_prob=0.9, crossover=crossover, seed=seed
+                    )
+                end
+                test_sampler_reproducibility(constructor_kwargs)
+            end
+        end
     end
 
     @testset "NSGAIIISampler" begin
@@ -166,18 +184,36 @@ end
         constructor(seed) = NSGAIIISampler(; seed=seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
-        # TODO: Test crossover, constraints_func, elite_population_selection_strategy,
+        # TODO: Test constraints_func, elite_population_selection_strategy,
         #       child_generation_strategy, after_trial_strategy
-        sampler = NSGAIIISampler(;
-            mutation_prob=0.9, seed=42, reference_points=rand(Float64, 2, 2)
-        )
-        test_sampler(sampler)
+        @testset "kwargs with Crossover" begin
+            for crossover in [
+                UniformCrossover(),
+                BLXAlphaCrossover(),
+                SPXCrossover(),
+                SBXCrossover(),
+                VSBXCrossover(),
+                UNDXCrossover(),
+            ]
+                sampler = NSGAIIISampler(;
+                    mutation_prob=0.9,
+                    crossover=crossover,
+                    seed=42,
+                    reference_points=rand(Float64, 2, 2),
+                )
+                test_sampler(sampler)
 
-        constructor(seed) = NSGAIIISampler(;
-            mutation_prob=0.9, seed=seed, reference_points=rand(Float64, 2, 2)
-        )
-        test_sampler_reproducibility(constructor)
+                function constructor_kwargs(seed)
+                    return NSGAIIISampler(;
+                        mutation_prob=0.9,
+                        crossover=crossover,
+                        seed=seed,
+                        reference_points=rand(Float64, 2, 2),
+                    )
+                end
+                test_sampler_reproducibility(constructor_kwargs)
+            end
+        end
     end
 
     @testset "GridSampler" begin
@@ -198,12 +234,14 @@ end
         constructor(seed) = QMCSampler(; seed=seed)
         test_sampler_reproducibility(constructor)
 
-        # Test kwargs
-        sampler = QMCSampler(; seed=42, independent_sampler=RandomSampler(42))
-        test_sampler(sampler)
+        @testset "kwargs" begin
+            sampler = QMCSampler(; seed=42, independent_sampler=RandomSampler(42))
+            test_sampler(sampler)
 
-        constructor(seed) = QMCSampler(; seed=seed, independent_sampler=RandomSampler(seed))
-        test_sampler_reproducibility(constructor)
+            constructor_kwargs(seed) =
+                QMCSampler(; seed=seed, independent_sampler=RandomSampler(seed))
+            test_sampler_reproducibility(constructor_kwargs)
+        end
     end
 
     @testset "BruteForceSampler" begin

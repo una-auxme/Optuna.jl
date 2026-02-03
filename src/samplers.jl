@@ -168,6 +168,11 @@ struct CmaEsSampler <: BaseSampler
         source_trials::Union{Nothing,Vector{Trial}}=nothing,
     )
         add_conda_pkg("cmaes"; version=">=0.12,<1")
+        if !isnothing(source_trials)
+            @warn "source_trials are currently not supported. " *
+                "Setting source_trails to nothing."
+            source_trials = nothing
+        end
         sampler = optuna.samplers.CmaEsSampler(
             x0,
             sigma0,
@@ -198,11 +203,10 @@ For further information see the [NSGAIISampler](https://optuna.readthedocs.io/en
 struct NSGAIISampler <: BaseSampler
     sampler::Any
 
-    # TODO: crossover is a class in optuna
     function NSGAIISampler(;
         population_size::Int=50,
         mutation_prob::Union{Nothing,Float64}=nothing,
-        crossover::Nothing=nothing,
+        crossover::Union{Nothing,BaseCrossover}=nothing,
         crossover_prob::Float64=0.9,
         swapping_prob::Float64=0.5,
         seed::Union{Nothing,Integer}=nothing,
@@ -214,7 +218,7 @@ struct NSGAIISampler <: BaseSampler
         sampler = optuna.samplers.NSGAIISampler(;
             population_size=population_size,
             mutation_prob=mutation_prob,
-            crossover=crossover,
+            crossover=isnothing(crossover) ? nothing : crossover.crossover,
             crossover_prob=crossover_prob,
             swapping_prob=swapping_prob,
             seed=seed,
@@ -240,7 +244,7 @@ struct NSGAIIISampler <: BaseSampler
     function NSGAIIISampler(;
         population_size::Int=50,
         mutation_prob::Union{Nothing,Float64}=nothing,
-        crossover::Nothing=nothing,
+        crossover::Union{Nothing,BaseCrossover}=nothing,
         crossover_prob::Float64=0.9,
         swapping_prob::Float64=0.5,
         seed::Union{Nothing,Integer}=nothing,
@@ -254,7 +258,7 @@ struct NSGAIIISampler <: BaseSampler
         sampler = optuna.samplers.NSGAIIISampler(;
             population_size=population_size,
             mutation_prob=mutation_prob,
-            crossover=crossover,
+            crossover=isnothing(crossover) ? nothing : crossover.crossover,
             crossover_prob=crossover_prob,
             swapping_prob=swapping_prob,
             seed=seed,
