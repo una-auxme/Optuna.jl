@@ -32,17 +32,21 @@ end
 include("types.jl")
 include("utils.jl")
 include("pruners.jl")
-include("samplers.jl")
 include("journal.jl")
 include("storage.jl")
 include("artifacts.jl")
 include("trial.jl")
+include("crossover.jl")
+include("samplers.jl")
 include("study.jl")
 include("optimize.jl")
 
 # pruners.jl
 export MedianPruner, NopPruner, PatientPruner, PercentilePruner
 export SuccessiveHalvingPruner, HyperbandPruner, ThresholdPruner, WilcoxonPruner
+# crossover.jl
+export UniformCrossover,
+    BLXAlphaCrossover, SPXCrossover, SBXCrossover, VSBXCrossover, UNDXCrossover
 # samplers.jl
 export RandomSampler,
     TPESampler,

@@ -65,8 +65,7 @@ struct PatientPruner <: BasePruner
     function PatientPruner(
         wrapped_pruner::Union{BasePruner,Nothing}, patience::Int; min_delta::Float64=0.0
     )
-        py_wrapped =
-            isnothing(wrapped_pruner) ? PythonCall.pybuiltins.None : wrapped_pruner.pruner
+        py_wrapped = isnothing(wrapped_pruner) ? nothing : wrapped_pruner.pruner
         pruner = optuna.pruners.PatientPruner(py_wrapped, patience; min_delta=min_delta)
         return new(pruner)
     end
@@ -201,11 +200,9 @@ struct ThresholdPruner <: BasePruner
         n_warmup_steps::Int=0,
         interval_steps::Int=1,
     )
-        py_lower = isnothing(lower) ? PythonCall.pybuiltins.None : lower
-        py_upper = isnothing(upper) ? PythonCall.pybuiltins.None : upper
         pruner = optuna.pruners.ThresholdPruner(;
-            lower=py_lower,
-            upper=py_upper,
+            lower=lower,
+            upper=upper,
             n_warmup_steps=n_warmup_steps,
             interval_steps=interval_steps,
         )
@@ -218,7 +215,6 @@ end
         p_threshold::Float64=0.1,
         n_startup_steps::Int=2)
 
-WilcoxonPruner depends on Scipy, which isnt shipped with this package by default. 
 Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon signed-rank test between the current trial and the current best trial, and stops whenever the pruner is sure up to a given p-value that the current trial is worse than the best one.
 
 ## Arguments
@@ -228,7 +224,7 @@ Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon
 struct WilcoxonPruner <: BasePruner
     pruner::Any
     function WilcoxonPruner(; p_threshold::Float64=0.1, n_startup_steps::Int=2)
-        @warn "WilcoxonPruner depends on Scipy.stats, which is not included with this package by default. To use WilcoxonPruner you would have to add it to the CondaPkg.toml"
+        add_conda_pkg("scipy"; version=">=1,<2")
         pruner = optuna.pruners.WilcoxonPruner(;
             p_threshold=p_threshold, n_startup_steps=n_startup_steps
         )

@@ -156,7 +156,7 @@ end
         for step in 0:5
             report(trial, 100.0, step)
         end
-        @test_broken should_prune(trial) isa Bool
+        @test should_prune(trial) isa Bool
         tell(study, trial, 100.0)
     end
 end

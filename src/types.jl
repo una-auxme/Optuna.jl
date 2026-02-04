@@ -14,6 +14,9 @@ abstract type BaseJournalBackend end
 # pruners.jl
 abstract type BasePruner end
 
+# crossover.jl
+abstract type BaseCrossover end
+
 # samplers.jl
 abstract type BaseSampler end
 
