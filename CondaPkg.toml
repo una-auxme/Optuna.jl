@@ -1,2 +1,2 @@
 [deps]
-optuna = ""
+optuna = ">=4,<5"

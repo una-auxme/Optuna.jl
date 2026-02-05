@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2026 Julian Trommer
+# Copyright (c) 2026 Julian Trommer, Valentin Höpfner, Andreas Hofmann, Josef Kircher, Tobias Thummerer, and contributors
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
@@ -14,7 +14,7 @@ makedocs(;
     modules=[Optuna],
     checkdocs=:exports,
     linkcheck=false,
-    pages=["Home" => "index.md"],
+    pages=["Home" => "index.md", "API Reference" => "api.md"],
 )
 
 deploydocs(; repo="github.com/una-auxme/Optuna.jl.git", devbranch="main")
