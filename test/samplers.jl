@@ -102,9 +102,8 @@ end
             sampler = GPSampler(; seed=42, independent_sampler=RandomSampler(42))
             test_sampler(sampler)
 
-            constructor_kwargs(seed) = GPSampler(;
-                seed=seed, independent_sampler=RandomSampler(seed)
-            )
+            constructor_kwargs(seed) =
+                GPSampler(; seed=seed, independent_sampler=RandomSampler(seed))
             test_sampler_reproducibility(constructor_kwargs)
         end
     end
@@ -239,9 +238,8 @@ end
             sampler = QMCSampler(; seed=42, independent_sampler=RandomSampler(42))
             test_sampler(sampler)
 
-            constructor_kwargs(seed) = QMCSampler(;
-                seed=seed, independent_sampler=RandomSampler(seed)
-            )
+            constructor_kwargs(seed) =
+                QMCSampler(; seed=seed, independent_sampler=RandomSampler(seed))
             test_sampler_reproducibility(constructor_kwargs)
         end
     end
