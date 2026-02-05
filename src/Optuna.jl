@@ -14,21 +14,6 @@ function __init__()
     return PythonCall.pycopy!(optuna, pyimport("optuna"))
 end
 
-# multithreading locks
-const lk = ReentrantLock()
-function thread_safe(f)
-    res = nothing
-    lock(lk)
-    try
-        PythonCall.GIL.lock() do
-            res = f()
-        end
-    finally
-        unlock(lk)
-    end
-    return res
-end
-
 include("types.jl")
 include("utils.jl")
 include("pruners.jl")

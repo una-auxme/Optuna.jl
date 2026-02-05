@@ -52,6 +52,7 @@ function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
     end
 end
 
+# convert seed for samplers
 function convert_seed(seed::Integer)
     try
         return convert(UInt32, seed)
@@ -65,3 +66,18 @@ function convert_seed(seed::Integer)
 end
 convert_seed(seed::UInt32) = seed
 convert_seed(::Nothing) = nothing
+
+# multithreading locks
+const lk = ReentrantLock()
+function thread_safe(f)
+    res = nothing
+    lock(lk)
+    try
+        PythonCall.GIL.lock() do
+            res = f()
+        end
+    finally
+        unlock(lk)
+    end
+    return res
+end
