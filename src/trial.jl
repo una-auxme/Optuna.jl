@@ -56,10 +56,15 @@ function suggest_float(
     step::Union{Nothing,T}=nothing,
     log::Bool=false,
 ) where {T<:AbstractFloat}
-    @warn "Float Types other than Float64 will be converted to Float64, because that´s what Optuna uses internally. If you need other Float-Types you need to handle conversion after using `suggest_float`." maxlog =
+    @warn "Converting to Float64, because that´s what Optuna uses internally. If you need other Float-Types you need to handle conversion after using `suggest_float`." maxlog =
         5
     return suggest_float(
-        trial, name, Float64(low), Float64(high), convert(Union{Nothing,Float64}, step), log
+        trial,
+        name,
+        Float64(low),
+        Float64(high);
+        step=convert(Union{Nothing,Float64}, step),
+        log=log,
     )
 end
 

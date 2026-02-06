@@ -48,6 +48,9 @@
         @test x isa Float64
         @test -10.0 <= x <= 10.0
 
+        @test_logs (:warn, r"Converting") x = suggest_float(trial, "x", -10.0f0, 10.0f0)
+        x = @test x isa Float64
+
         # same name returns same value
         y2 = suggest_float(trial, "y", 1e-100, 1e100)
         @test y == y2
