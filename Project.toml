@@ -1,7 +1,7 @@
 name = "Optuna"
 uuid = "a5d0552b-b2dc-4f08-ac5c-85ca7d701b92"
 authors = ["Julian Trommer <julian.trommer@uni-a.de>", "Valentin Höpfner <valentin.hoepfner@uni-a.de>", "Andreas Hofmann <andreas.hofmann@uni-a.de>", "Josef Kircher <josef.kircher@uni-a.de>", "Tobias Thummerer <tobias.thummerer@uni-a.de>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [deps]
 CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
