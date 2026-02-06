@@ -46,32 +46,52 @@ Suggest a float value for the given parameter name within the specified range.
 - `high::T`: The upper bound of the range (inclusive).
 
 ## Returns
-- `T`: Suggested float value.
+- `Float64`: Suggested float value.
 """
+function suggest_float(
+    trial::Trial,
+    name::String,
+    low::T,
+    high::T;
+    step::Union{Nothing,T}=nothing,
+    log::Bool=false,
+) where {T<:AbstractFloat}
+    @warn "Float Types other than Float64 will be converted to Float64, because that´s what Optuna uses internally. If you need other Float-Types you need to handle conversion after using `suggest_float`." maxlog =
+        5
+    return suggest_float(
+        trial, name, Float64(low), Float64(high), convert(Union{Nothing,Float64}, step), log
+    )
+end
+
 function suggest_float(
     trial::Trial{false},
     name::String,
-    low::T,
-    high::T;
-    step::Union{Nothing,T}=nothing,
+    low::Float64,
+    high::Float64;
+    step::Union{Nothing,Float64}=nothing,
     log::Bool=false,
-) where {T<:AbstractFloat}
+)
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
-    return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
+    return pyconvert(
+        Float64, trial.trial.suggest_float(name, low, high; step=step, log=log)
+    )
 end
+
 function suggest_float(
     trial::Trial{true},
     name::String,
-    low::T,
-    high::T;
-    step::Union{Nothing,T}=nothing,
+    low::Float64,
+    high::Float64;
+    step::Union{Nothing,Float64}=nothing,
     log::Bool=false,
-) where {T<:AbstractFloat}
+)
     @assert !(!isnothing(step) && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting a float."
     thread_safe() do
-        return pyconvert(T, trial.trial.suggest_float(name, low, high; step=step, log=log))
+        return pyconvert(
+            Float64, trial.trial.suggest_float(name, low, high; step=step, log=log)
+        )
     end
 end
 
