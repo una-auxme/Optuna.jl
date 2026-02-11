@@ -65,7 +65,7 @@
         tell(study1, trial, 42.0)
 
         # load the same study
-        study2 = load_study("load_test", storage, artifacts; RandomSampler(), NopPruner())
+        study2 = load_study("load_test", storage, artifacts; sampler=RandomSampler(42), pruner=NopPruner())
         @test best_value(study2) == 42.0
     end
 
