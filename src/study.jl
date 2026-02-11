@@ -169,7 +169,7 @@ function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
 end
 
 """
-    function tell(
+    tell(
         study::Study,
         trial::Trial{false},
         score::Union{Nothing,T,Vector{T}}=nothing;

@@ -150,7 +150,7 @@ struct GPSampler <: BaseSampler
 end
 
 """
-    function CmaEsSampler(
+    CmaEsSampler(
         x0::Union{Nothing,Dict{String,Any}}=nothing,
         sigma0::Union{Nothing,Float64}=nothing,
         n_startup_trials::Int=1,
