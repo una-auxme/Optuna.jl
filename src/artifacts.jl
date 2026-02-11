@@ -109,7 +109,7 @@ end
 """
     get_all_artifact_meta(
         study::Study, 
-        trial::Trial
+        trial
     )
 
 Get all artifact metadata for the trial in the given study.
@@ -117,12 +117,12 @@ For further information see the [get_all_artifact_meta](https://optuna.readthedo
 
 ## Arguments
 - `study::Study`: The study to get the artifact metadata from. (see [Study](@ref))
-- `trial::Trial`: The trial to get the artifact metadata from. (see [Trial](@ref))
+- `trial`: The trial to get the artifact metadata from. (see [Trial](@ref))
 
 ## Returns
 - `Vector{ArtifactMeta}`: List of artifact metadata of the given trial.
 """
-function get_all_artifact_meta(study::Study, trial::Trial)
+function get_all_artifact_meta(study::Study, trial)
     artifact_metas = optuna.artifacts.get_all_artifact_meta(
         trial; storage=study.storage.storage
     )
