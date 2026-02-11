@@ -154,11 +154,7 @@ For further information see the [download_artifact](https://optuna.readthedocs.i
 - `artifact_id::String`: The ID of the artifact to download.
 - `file_path::String`: The path where the downloaded artifact should be stored.
 """
-function download_artifact(;
-        study::Study, 
-        artifact_id::String, 
-        file_path::String,
-    )
+function download_artifact(; study::Study, artifact_id::String, file_path::String)
     return optuna.artifacts.download_artifact(;
         artifact_store=study.artifact_store.artifact_store,
         artifact_id=artifact_id,

@@ -83,6 +83,17 @@ ThresholdPruner
 WilcoxonPruner
 ```
 
+## Crossover
+
+```@docs
+UniformCrossover
+BLXAlphaCrossover
+SPXCrossover
+SBXCrossover
+VSBXCrossover
+UNDXCrossover
+```
+
 ## Study
 
 ```@docs
