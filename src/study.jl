@@ -87,7 +87,7 @@ function load_study(
     pruner::Union{Nothing,BasePruner}=nothing,
 )
     study = optuna.load_study(;
-        study_name=study_name, storage=storage.storage, sampler=sampler, pruner=pruner
+        study_name=study_name, storage=storage.storage, sampler=isnothing(sampler) ? nothing : sampler.sampler, pruner=isnothing(pruner) ? nothing : pruner.pruner
     )
     return Study(study, artifact_store, storage)
 end
