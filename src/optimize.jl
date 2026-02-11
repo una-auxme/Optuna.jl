@@ -4,9 +4,16 @@
 #
 
 """
-    optimize(study::Study, objective::Function, params::NamedTuple; n_trials=100::Int)
+    optimize(
+        study::Study, 
+        objective::Function, 
+        params::NamedTuple; 
+        n_trials::Int=100,
+        verbose::Bool=false,
+        n_jobs::Integer=1,
+    )
 
-Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+Optimize function that checks if the optimization should be performed in a single-threaded or multi-threaded way based on the keyword argument `n_jobs` and calls the corresponding function.
 
 Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
 
@@ -18,7 +25,9 @@ If the objective function returns `nothing`, the trial is pruned.
 - `params::NamedTuple`: Named tuple of parameters to optimize.
 
 ## Keyword Arguments
-- `n_trials::Int`: Number of trials to run.
+- `n_trials::Int=100`: Number of trials to run.
+- `verbose::Bool=false`: If true, print information about the optimization process.
+- `n_jobs::Integer=1`: Number of threads to use for optimization. If `n_jobs > 1`, multithreading is used. Note that the number of threads allocated for the process must be greater than or equal to `n_jobs` and exactly one interactive thread must be allocated for multithreading to work. You can start Julia with n threads and an interactive thread by setting the environment variable `JULIA_NUM_THREADS=n,1` or start the Julia REPL with `-t n,1`.
 
 ## Returns
 - `Study`: The optimized study. [Study](@ref)
@@ -27,7 +36,7 @@ function optimize(
     study::Study,
     objective::Function,
     params::NamedTuple;
-    n_trials=100::Int,
+    n_trials::Int=100,
     verbose::Bool=false,
     n_jobs::Integer=1,
 )
@@ -57,7 +66,23 @@ function optimize(
     end
 end
 
-function run_trial(study, trial, params, objective)
+"""
+    run_trial(
+        study::Study, 
+        trial::Trial, 
+        params::NamedTuple; 
+        objective::Function
+    )
+
+Extract the suggested parameters from the trial and run the objective function with these parameters. Then, report the result of the trial to the study. If the score is `nothing`, the trial is pruned.
+
+## Arguments
+- `study::Study`: [Study](@ref) to which the `trial` belongs.
+- `trial::Trial`: The trial for which the parameters are suggested and the objective function is run. (see [Trial](@ref))
+- `params::NamedTuple`: Named tuple of parameters to optimize.
+- `objective::Function`: Function that takes a trial and returns a score.
+"""
+function run_trial(study::Study, trial::Trial, params::NamedTuple, objective::Function)
     args_fn = Dict{Symbol,Any}()
 
     for k in keys(params)
@@ -91,6 +116,33 @@ function run_trial(study, trial, params, objective)
     end
 end
 
+"""
+    optimize_singlethreading(
+        study::Study, 
+        objective::Function, 
+        params::NamedTuple; 
+        n_trials::Int=100,
+        verbose::Bool=false,
+    )
+
+Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+
+Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
+
+This function works in a single-threaded way and is used when the keyword argument `n_jobs` of `optimize` is set to 1.
+
+## Arguments
+- `study::Study`: [Study](@ref) to which the `trial` belongs.
+- `objective::Function`: Function that takes a trial and returns a score.
+- `params::NamedTuple`: Named tuple of parameters to optimize.
+
+## Keyword Arguments
+- `n_trials::Int=100`: Number of trials to run.
+- `verbose::Bool=false`: If true, print information about the optimization process.
+
+## Returns
+- `Study`: The optimized study. [Study](@ref)
+"""
 function optimize_singlethreading(
     study::Study,
     objective::Function,
@@ -111,11 +163,38 @@ function optimize_singlethreading(
     return study
 end
 
+"""
+    optimize_multithreading(
+        study::Study, 
+        objective::Function, 
+        params::NamedTuple; 
+        n_trials::Int=100,
+        verbose::Bool=false,
+    )
+
+Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+
+Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
+
+This function works in a multi-threaded way and is used when the keyword argument `n_jobs` of `optimize` is set to a value greater than 1.
+
+## Arguments
+- `study::Study`: [Study](@ref) to which the `trial` belongs.
+- `objective::Function`: Function that takes a trial and returns a score.
+- `params::NamedTuple`: Named tuple of parameters to optimize.
+
+## Keyword Arguments
+- `n_trials::Int=100`: Number of trials to run.
+- `verbose::Bool=false`: If true, print information about the optimization process.
+
+## Returns
+- `Study`: The optimized study. [Study](@ref)
+"""
 function optimize_multithreading(
     study::Study,
     objective::Function,
     params::NamedTuple;
-    n_trials=100::Int,
+    n_trials::Int=100,
     verbose::Bool=false,
 )
     PythonCall.GIL.unlock() do

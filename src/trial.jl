@@ -4,15 +4,28 @@
 #
 
 """
-    suggest_int(trial::Trial, name::String, low::T, high::T) where {T<:Signed}
+    suggest_int(
+        trial::Trial, 
+        name::String, 
+        low::T, 
+        high::T;
+        step::T=1, 
+        log::Bool=false
+    ) where {T<:Signed}
 
 Suggest an integer value for the given parameter name within the specified range.
+For further information see the [suggest_int](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_int) in the Optuna python documentation.
+
 
 ## Arguments
 - `trial::Trial`: The trial to suggest the parameter for. (see [Trial](@ref))
 - `name::String`: The name of the parameter to suggest.
 - `low::T`: The lower bound of the range (inclusive).
 - `high::T`: The upper bound of the range (inclusive).
+
+## Keyword Arguments
+- `step::T=1`: The step size for the range. The suggested value will be a multiple of `step` away from `low`.
+- `log::Bool=false`: If `true`, the range will be sampled on a logarithmic scale. (
 
 ## Returns
 - `T`: Suggested integer value.
@@ -35,15 +48,27 @@ function suggest_int(
 end
 
 """
-    suggest_float(trial::Trial, name::String, low::T, high::T) where {T<:AbstractFloat}
+    suggest_float(
+        trial::Trial,
+        name::String,
+        low::T,
+        high::T;
+        step::Union{Nothing,T}=nothing,
+        log::Bool=false,
+    ) where {T<:AbstractFloat}
 
 Suggest a float value for the given parameter name within the specified range.
+For further information see the [suggest_float](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_float) in the Optuna python documentation.
 
 ## Arguments
 - `trial::Trial`: The trial to suggest the parameter for. (see [Trial](@ref))
 - `name::String`: The name of the parameter to suggest.
 - `low::T`: The lower bound of the range (inclusive).
 - `high::T`: The upper bound of the range (inclusive).
+
+## Keyword Arguments
+- `step::Union{Nothing,T}=nothing`: A step of discretization.
+- `log::Bool=false`: If `true`, the range will be sampled on a logarithmic scale. (
 
 ## Returns
 - `Float64`: Suggested float value.
@@ -101,18 +126,22 @@ function suggest_float(
 end
 
 """
-    suggest_categorical(trial::Trial, name::String, choices::Vector{T}) where {T<:Union{Bool,Int,AbstractFloat,String}}
+    suggest_categorical(
+        trial::Trial, 
+        name::String, 
+        choices::Vector{T}
+    ) where {T<:Union{Bool,Int,AbstractFloat,String}}
 
 Suggest a categorical value for the given parameter name from the specified choices.
+For further information see the [suggest_categorical](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_categorical) in the Optuna python documentation.
 
 ## Arguments
 - `trial::Trial`: The trial to suggest the parameter for. (see [Trial](@ref))
 - `name::String`: The name of the parameter to suggest.
-- `low::T`: The lower bound of the range (inclusive).
-- `high::T`: The upper bound of the range (inclusive).
+- `choices::Vector{T}`: The choices to suggest from.
 
 ## Returns
-- `T`: Suggested integer value.
+- `T`: Suggested categorical value.
 """
 function suggest_categorical(
     trial::Trial{false}, name::String, choices::Vector{T}
@@ -128,9 +157,14 @@ function suggest_categorical(
 end
 
 """
-    report(trial::Trial, value::AbstractFloat, step::Int)
+    report(
+        trial::Trial, 
+        value::AbstractFloat, 
+        step::Int
+    )
 
 Report an intermediate value for the given trial at a specific step.
+For further information see the [report](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.report) in the Optuna python documentation.
 
 ## Arguments
 - `trial::Trial`: The trial to report the value for. (see [Trial](@ref))
@@ -147,9 +181,12 @@ function report(trial::Trial{true}, value::AbstractFloat, step::Int)
 end
 
 """
-    should_prune(trial::Trial)
+    should_prune(
+        trial::Trial
+    )
 
 Check if the given trial should be pruned based on the pruner's decision.
+For further information see the [should_prune](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.should_prune) in the Optuna python documentation.
 
 ## Arguments
 - `trial::Trial`: The trial to check for pruning. (see [Trial](@ref))

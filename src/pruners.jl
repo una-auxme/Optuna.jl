@@ -4,12 +4,14 @@
 #
 
 """
-    MedianPruner(n_startup_trials::Int=5,
+    MedianPruner(
+        n_startup_trials::Int=5,
         n_warmup_steps::Int=0,
         interval_steps::Int=1;
         n_min_trials::Int=1)
 
 Pruner using the median stopping rule. Prune if the trial's best intermediate result is worse than median of intermediate results of previous trials at the same step.
+For further information see the [MedianPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.MedianPruner.html) in the Optuna python documentation.
 
 ## Arguments
 - `n_startup_trials::Int=5`: Pruning is disabled until the given number of trials finish in the same study.
@@ -37,6 +39,8 @@ end
     NopPruner()
 
 Pruner which never prunes trials.
+For further information see the [NopPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.NopPruner.html) in the Optuna python documentation.
+
 """
 struct NopPruner <: BasePruner
     pruner::Any
@@ -48,11 +52,13 @@ struct NopPruner <: BasePruner
 end
 
 """
-    PatientPruner(wrapped_pruner::Union{BasePruner,Nothing},
+    PatientPruner(
+        wrapped_pruner::Union{BasePruner,Nothing},
         patience::Int;
         min_delta::Float64=0.0)
 
 Pruner which wraps another pruner with tolerance. This pruner monitors intermediate values in a trial and prunes the trial if the improvement in the intermediate values after a patience period is less than a threshold.
+For further information see the [PatientPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.PatientPruner.html) in the Optuna python documentation.
 
 ## Arguments
 - `wrapped_pruner::Union{BasePruner,Nothing}`: Wrapped pruner to perform pruning when PatientPruner allows a trial to be pruned. If it is `nothing`, this pruner is equivalent to early-stopping taken the intermediate values in the individual trial.
@@ -72,13 +78,15 @@ struct PatientPruner <: BasePruner
 end
 
 """
-    PercentilePruner(percentile::Float64,
+    PercentilePruner(
+        percentile::Float64,
         n_startup_trials::Int=5,
         n_warmup_steps::Int=0,
         interval_steps::Int=1;
         n_min_trials::Int=1)
 
 Pruner to keep the specified percentile of the trials. Prune if the best intermediate value is in the bottom percentile among trials at the same step.
+For further information see the [PercentilePruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.PercentilePruner.html) in the Optuna python documentation.
 
 ## Arguments
 - `percentile::Float64`: Percentile which must be between 0 and 100 inclusive (e.g., When given 25.0, top of 25th percentile trials are kept).
@@ -116,11 +124,12 @@ end
         bootstrap_count::Int=0)
 
 Pruner using Asynchronous Successive Halving Algorithm.
+For further information see the [SuccessiveHalvingPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.SuccessiveHalvingPruner.html) in the Optuna python documentation.
 
-## Arguments
-- `min_resource::Union{String,Int}="auto"`: A parameter for specifying the minimum resource allocated to a trial (in the paper this parameter is referred to as r). This parameter defaults to "auto" where the value is determined based on a heuristic that looks at the number of required steps for the first trial to complete.
-- `reduction_factor::Int=4`: A parameter for specifying reduction factor of promotable trials (in the paper this parameter is referred to as η). At the completion point of each rung, about 1/reduction_factor trials will be promoted.
-- `min_early_stopping_rate::Int=0`: A parameter for specifying the minimum early-stopping rate (in the paper this parameter is referred to as s).
+## Keyword Arguments
+- `min_resource::Union{String,Int}="auto"`: A parameter for specifying the minimum resource allocated to a trial (in the paper this parameter is referred to as `r`). This parameter defaults to "auto" where the value is determined based on a heuristic that looks at the number of required steps for the first trial to complete.
+- `reduction_factor::Int=4`: A parameter for specifying reduction factor of promotable trials (in the paper this parameter is referred to as `η`). At the completion point of each rung, about 1/reduction_factor trials will be promoted.
+- `min_early_stopping_rate::Int=0`: A parameter for specifying the minimum early-stopping rate (in the paper this parameter is referred to as `s`).
 - `bootstrap_count::Int=0`: Minimum number of trials that need to complete a rung before any trial is considered for promotion into the next rung.
 """
 struct SuccessiveHalvingPruner <: BasePruner
@@ -150,11 +159,12 @@ end
         bootstrap_count::Int=0)
 
 Pruner using Hyperband.
+For further information see the [HyperbandPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.HyperbandPruner.html) in the Optuna python documentation.
 
-## Arguments
-- `min_resource::Int=1`: A parameter for specifying the minimum resource allocated to a trial noted as r in the paper. A smaller r will give a result faster, but a larger r will give a better guarantee of successful judging between configurations.
+## Keyword Arguments
+- `min_resource::Int=1`: A parameter for specifying the minimum resource allocated to a trial noted as `r` in the paper. A smaller `r` will give a result faster, but a larger `r` will give a better guarantee of successful judging between configurations.
 - `max_resource::Union{String,Int}="auto"`: A parameter for specifying the maximum resource allocated to a trial. This value represents and should match the maximum iteration steps (e.g., the number of epochs for neural networks). When this argument is "auto", the maximum resource is estimated according to the completed trials.
-- `reduction_factor::Int=3`: A parameter for specifying reduction factor of promotable trials noted as η in the paper.
+- `reduction_factor::Int=3`: A parameter for specifying reduction factor of promotable trials noted as `η` in the paper.
 - `bootstrap_count::Int=0`: Parameter specifying the number of trials required in a rung before any trial can be promoted. Incompatible with `max_resource="auto"`.
 """
 struct HyperbandPruner <: BasePruner
@@ -184,8 +194,9 @@ end
         interval_steps::Int=1)
 
 Pruner to detect outlying metrics of the trials. Prune if a metric exceeds upper threshold, falls behind lower threshold or reaches NaN.
+For further information see the [ThresholdPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.ThresholdPruner.html) in the Optuna python documentation.
 
-## Arguments
+## Keyword Arguments
 - `lower::Union{Float64,Nothing}=nothing`: A minimum value which determines whether pruner prunes or not. If an intermediate value is smaller than lower, it prunes.
 - `upper::Union{Float64,Nothing}=nothing`: A maximum value which determines whether pruner prunes or not. If an intermediate value is larger than upper, it prunes.
 - `n_warmup_steps::Int=0`: Pruning is disabled if the step is less than the given number of warmup steps.
@@ -216,8 +227,9 @@ end
         n_startup_steps::Int=2)
 
 Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon signed-rank test between the current trial and the current best trial, and stops whenever the pruner is sure up to a given p-value that the current trial is worse than the best one.
+For further information see the [WilcoxonPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.WilcoxonPruner.html) in the Optuna python documentation.
 
-## Arguments
+## Keyword Arguments
 - `p_threshold::Float64=0.1`: The p-value threshold for pruning. This value should be between 0 and 1. A trial will be pruned whenever the pruner is sure up to the given p-value that the current trial is worse than the best trial. The larger this value is, the more aggressive pruning will be performed.
 - `n_startup_steps::Int=2`: The number of steps before which no trials are pruned. Pruning starts only after you have n_startup_steps steps of available observations for comparison between the current trial and the best trial.
 """

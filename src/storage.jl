@@ -3,9 +3,12 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 """
-    RDBStorage(url::String)
+    RDBStorage(
+        url::String
+    )
 
 Storage class for RDB backends.
+For further information see the [RDBStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.RDBStorage.html) in the Optuna python documentation.
 
 ## Arguments
 - `url::String`: URL of the database (e.g. directory and filename for SQLite).
@@ -27,6 +30,7 @@ end
     InMemoryStorage()
 
 Storage class that stores data in memory of the running process.
+For further information see the [InMemoryStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.InMemoryStorage.html) in the Optuna python documentation.
 """
 struct InMemoryStorage <: BaseStorage
     storage::Any
@@ -37,9 +41,12 @@ struct InMemoryStorage <: BaseStorage
 end
 
 """
-    JournalStorage(backend::BaseJournalBackend)
+    JournalStorage(
+        backend::BaseJournalBackend
+    )
 
 Storage class for Journal storage backend.
+For further information see the [JournalStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.JournalStorage.html) in the Optuna python documentation.
 
 ## Arguments
 - `backend::BaseJournalBackend`: Backend that determines where the data is stored.
@@ -53,9 +60,12 @@ struct JournalStorage <: BaseStorage
 end
 
 """
-    get_all_study_names(storage::BaseStorage)
+    get_all_study_names(
+        storage::BaseStorage
+    )
 
 Returns all study names stored in the given storage.
+For further information see the [get_all_study_names](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.get_all_study_names.html#optuna.get_all_study_names) in the Optuna python documentation.
 
 ## Arguments
 - `storage::BaseStorage`: Storage backend to query.
@@ -68,7 +78,10 @@ function get_all_study_names(storage::BaseStorage)
 end
 
 """
-    create_sqlite_url(database_path::String, database_name::String)
+    create_sqlite_url(
+        database_path::String, 
+        database_name::String
+    )
 
 Returns a valid URL for a SQLite database with the given arguments.
 
@@ -86,17 +99,24 @@ function create_sqlite_url(database_path::String, database_name::String)
 end
 
 """
-    create_mysql_url(; user_name::String, password::String, host::String, port::String, database_name::String, query::Dict{String,Any})
+    create_mysql_url(;
+        user_name::String="",
+        password::String="",
+        host::String="",
+        port::String="",
+        database_name::String="",
+        query::Dict{String,Any}=Dict{String,Any}(),
+)
 
 Returns a valid URL for a MySQL database with the given arguments.
 
 ## Keyword Arguments
-- `user_name::String`: Name of the database user.
-- `password::String`: Password of the database user.
-- `host::String`: Host where the database server is running.
-- `port::String`: Port of the database server.
-- `database_name::String`: Name of the database.
-- `query::Dict{String,Any}`: Query string with keys and either strings or additional query strings as values.
+- `user_name::String=""`: Name of the database user.
+- `password::String=""`: Password of the database user.
+- `host::String=""`: Host where the database server is running.
+- `port::String=""`: Port of the database server.
+- `database_name::String=""`: Name of the database.
+- `query::Dict{String,Any}=Dict{String,Any}()`: Query string with keys and either strings or additional query strings as values.
 
 ## Returns
 - `String`: URL to the MySQL database.
@@ -144,17 +164,21 @@ function create_mysql_url(;
 end
 
 """
-    create_redis_url(; user_name::String, password::String, host::String, port::String, database_index::String)
-
+    create_redis_url(;
+        user_name::String="",
+        password::String="",
+        host::String="",
+        port::String="6379",
+        database_index::String="0",
+)
 Returns a valid URL for a Redis server with the given arguments.
 
 ## Keyword Arguments
-- `user_name::String`: Name of the Redis user.
-- `password::String`: Password of the Redis user.
-- `host::String`: Host where the Redis server is running.
-- `port::String`: Port of the Redis server.
-- `database_index::String`: Index of the database.
-
+- `user_name::String=""`: Name of the Redis user.
+- `password::String=""`: Password of the Redis user.
+- `host::String=""`: Host where the Redis server is running.
+- `port::String="6379"`: Port of the Redis server.
+- `database_index::String="0"`: Index of the database.
 ## Returns
 - `String`: URL to the Redis database.
 """

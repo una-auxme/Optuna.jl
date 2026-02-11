@@ -4,7 +4,10 @@
 #
 
 """
-    is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String})
+    is_conda_pkg_installed(
+        pkg_name::String; 
+        version::Union{Nothing,String}=nothing
+    )
 
 Test if the given package with the given version is installed in the conda environment.
 
@@ -12,7 +15,7 @@ Test if the given package with the given version is installed in the conda envir
 - `pkg_name::String`: Name of the package.
 
 ## Keyword Arguments
-- `version::Union{Nothing,String}`: Version of the package.
+- `version::Union{Nothing,String}=nothing`: Version of the package.
 """
 function is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String}=nothing)
     dfile = CondaPkg.cur_deps_file()
@@ -28,7 +31,10 @@ function is_conda_pkg_installed(pkg_name::String; version::Union{Nothing,String}
 end
 
 """
-    add_conda_pkg(pkg_name::String; version::Union{Nothing,String})
+    add_conda_pkg(
+        pkg_name::String; 
+        version::Union{Nothing,String}=nothing
+    )
 
 Adds the given package with the given version in the conda environment if it is not installed.
 
@@ -36,7 +42,7 @@ Adds the given package with the given version in the conda environment if it is 
 - `pkg_name::String`: Name of the package.
 
 ## Keyword Arguments
-- `version::Union{Nothing,String}`: Version of the package.
+- `version::Union{Nothing,String}=nothing`: Version of the package.
 """
 function add_conda_pkg(pkg_name::String; version::Union{Nothing,String}=nothing)
     if !is_conda_pkg_installed(pkg_name; version=version)
