@@ -6,9 +6,12 @@
 using JLD2
 
 """
-    FileSystemArtifactStore(path::String)
+    FileSystemArtifactStore(
+        path::String
+    )
 
 Data structure for a file system based artifact store.
+For further information see the [FileSystemArtifactStore](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.FileSystemArtifactStore) in the Optuna python documentation.
 
 ## Arguments
 - `path::String`: Path to the directory where artifacts are stored.
@@ -29,6 +32,7 @@ end
     ArtifactMeta
 
 Data structure containing metadata for an artifact.
+For further information see the [ArtifactMeta](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.ArtifactMeta) in the Optuna python documentation.
 """
 struct ArtifactMeta
     artifact_id::String
@@ -37,9 +41,14 @@ struct ArtifactMeta
 end
 
 """
-    upload_artifact(study::Study, trial::Trial, data::Dict)
+    upload_artifact(
+        study::Study, 
+        trial::Trial, 
+        data::Dict
+    )
 
 Upload an artifact for a given trial in the study. The artifact is a .jld2 file containing the provided data.
+For further information see the [upload_artifact](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.upload_artifact) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to upload the artifact to. (see [Study](@ref))
@@ -78,9 +87,12 @@ function upload_artifact(study::Study, trial::Trial{true}, data::Dict)
 end
 
 """
-    get_all_artifact_meta(study::Study)
+    get_all_artifact_meta(
+        study::Study
+    )
 
 Get all artifact metadata for all trials in the given study.
+For further information see the [get_all_artifact_meta](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.get_all_artifact_meta) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to get the artifact metadata from. (see [Study](@ref))
@@ -95,18 +107,22 @@ function get_all_artifact_meta(study::Study)
 end
 
 """
-    get_all_artifact_meta(study::Study, trial)
+    get_all_artifact_meta(
+        study::Study, 
+        trial::Trial
+    )
 
 Get all artifact metadata for the trial in the given study.
+For further information see the [get_all_artifact_meta](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.get_all_artifact_meta) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to get the artifact metadata from. (see [Study](@ref))
-- `trial`: The trial to get the artifact metadata from. (see [Trial](@ref))
+- `trial::Trial`: The trial to get the artifact metadata from. (see [Trial](@ref))
 
 ## Returns
 - `Vector{ArtifactMeta}`: List of artifact metadata of the given trial.
 """
-function get_all_artifact_meta(study::Study, trial)
+function get_all_artifact_meta(study::Study, trial::Trial)
     artifact_metas = optuna.artifacts.get_all_artifact_meta(
         trial; storage=study.storage.storage
     )
@@ -124,16 +140,25 @@ function get_all_artifact_meta(study::Study, trial)
 end
 
 """
-    download_artifact(study::Study, artifact_id::String, file_path::String)
+    download_artifact(
+        study::Study, 
+        artifact_id::String, 
+        file_path::String
+    )
 
 Download an artifact from a given study identified by its artifact_id and the file_path where it should be stored.
+For further information see the [download_artifact](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.download_artifact) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to download the artifact from. (see [Study](@ref))
 - `artifact_id::String`: The ID of the artifact to download.
 - `file_path::String`: The path where the downloaded artifact should be stored.
 """
-function download_artifact(study::Study, artifact_id::String, file_path::String)
+function download_artifact(;
+        study::Study, 
+        artifact_id::String, 
+        file_path::String,
+    )
     return optuna.artifacts.download_artifact(;
         artifact_store=study.artifact_store.artifact_store,
         artifact_id=artifact_id,

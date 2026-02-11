@@ -25,7 +25,11 @@ abstract type BaseStorage end
 
 # study.jl
 """
-    Study(study, artifact_stpre, storage)
+    Study(
+        study, 
+        artifact_store, 
+        storage
+    )
 
 This data structure represents an Optuna study and its corresponding artifact and data storage. A study is a collection of trials that share the same optimization objective.
 """
@@ -38,7 +42,10 @@ end
 # trial.jl
 
 """
-    Trial(trial)
+    Trial(
+        trial, 
+        multithreading::Bool=false
+    )
 
 Trial is a data structure wrapper for an Optuna trial.
 """

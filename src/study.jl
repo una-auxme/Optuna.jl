@@ -8,13 +8,14 @@
         study_name::String,
         artifact_store::BaseArtifactStore,
         storage::BaseStorage;
-        sampler=nothing::Union{Nothing,BaseSampler},
-        pruner=nothing::Union{Nothing,BasePruner},
+        sampler::Union{Nothing,BaseSampler}=nothing,
+        pruner::Union{Nothing,BasePruner}=nothing,
         direction::String="minimize",
         load_if_exists::Bool=true,
     )
 
 Create a new study or load an existing one with the given name, artifact store, storage, optimization direction, sampler and pruner.
+For further information see the [create_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html) in the Optuna python documentation.
 
 ## Arguments
 - `study_name::String`: Name of the study.
@@ -34,8 +35,8 @@ function Study(
     study_name::String,
     artifact_store::BaseArtifactStore,
     storage::BaseStorage;
-    sampler=nothing::Union{Nothing,BaseSampler},
-    pruner=nothing::Union{Nothing,BasePruner},
+    sampler::Union{Nothing,BaseSampler}=nothing,
+    pruner::Union{Nothing,BasePruner}=nothing,
     direction::String="minimize",
     load_if_exists::Bool=true,
 )
@@ -57,19 +58,20 @@ end
 
 """
     load_study(
-        storage::BaseStorage,
         study_name::String,
+        storage::BaseStorage,
         artifact_store::BaseArtifactStore;
-        sampler=nothing::Union{Nothing,BaseSampler},
-        pruner=nothing::Union{Nothing,BasePruner},
+        sampler::Union{Nothing,BaseSampler}=nothing,
+        pruner::Union{Nothing,BasePruner}=nothing,
     )
 
 Load an existing study with the given name, artifact store, storage, sampler and pruner.
+For further information see the [load_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.load_study.html) in the Optuna python documentation.
 
 ## Arguments
 - `study_name::String`: Name of the study.
-- `artifact_store::BaseArtifactStore`: Artifact store for the study. (see [Artifacts](@ref))
 - `storage::BaseStorage`: Storage of the study. (see [Storage](@ref))
+- `artifact_store::BaseArtifactStore`: Artifact store for the study. (see [Artifacts](@ref))
 
 ## Keyword Arguments
 - `sampler::Union{Nothing,BaseSampler}=nothing`: Sampler to use for the study. (see [Sampler](@ref))
@@ -81,8 +83,8 @@ function load_study(
     study_name::String,
     storage::BaseStorage,
     artifact_store::BaseArtifactStore;
-    sampler=nothing::Union{Nothing,BaseSampler},
-    pruner=nothing::Union{Nothing,BasePruner},
+    sampler::Union{Nothing,BaseSampler}=nothing,
+    pruner::Union{Nothing,BasePruner}=nothing,
 )
     study = optuna.load_study(;
         study_name=study_name, storage=storage.storage, sampler=sampler, pruner=pruner
@@ -97,6 +99,7 @@ end
     )
 
 Delete a study with the given name and storage backend.
+For further information see the [delete_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.delete_study.html) in the Optuna python documentation.
 
 ## Arguments
 - `study_name::String`: Name of the study.
@@ -114,6 +117,7 @@ end
         to_study_name::String="",
     )
 Copy a study from one storage backend to another.
+For further information see the [copy_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.copy_study.html) in the Optuna python documentation.
 
 ## Arguments
 - `from_study_name::String`: Name of the study to copy.
@@ -136,16 +140,20 @@ function copy_study(
 end
 
 """
-    ask(study::Study)
+    ask(
+        study::Study; 
+        multithreading::Bool=Threads.nthreads() > 1
+    )
 
-Wrapper for the Optuna `ask` function [ToDo: link URL].
+Wrapper for the Optuna `ask` function. For further information see the [ask](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.ask) in the Optuna python documentation.
+
 This function is safe for multithreading.
 
 ## Arguments
 - `study::Study`: The study to ask the trial from. (see [Study](@ref))
 
 ## Keywords
-- `multithreading::Bool` if multithreading is used, default is automatically detected (true if more than one thread is available)
+- `multithreading::Bool=Threads.nthreads() > 1` if multithreading is used, default is automatically detected (`true` if more than one thread is available)
 
 ## Returns
 - `Trial`: The new trial. (see [Trial](@ref))
@@ -161,10 +169,15 @@ function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
 end
 
 """
-    tell(study::Study, trial::Trial, score::Union{Nothing,T,Vector{T}}=nothing; prune::Bool=false
+    function tell(
+        study::Study,
+        trial::Trial{false},
+        score::Union{Nothing,T,Vector{T}}=nothing;
+        prune::Bool=false,
 ) where {T<:AbstractFloat}
 
 Tell the study about the result of a trial. This is the proper way to complete a trial created with the [ask](@ref) function.
+For further information see the [tell](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.tell) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to report the trial to. (see [Study](@ref))
@@ -217,9 +230,12 @@ function tell(
 end
 
 """
-    best_trial(study::Study)
+    best_trial(
+        study::Study
+    )
 
 Get the best trial of the study.
+For further information see the [best_trial](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.best_trial) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to get the best trial from. (see [Study](@ref))
@@ -232,9 +248,12 @@ function best_trial(study::Study)
 end
 
 """
-    best_params(study::Study)
+    best_params(
+        study::Study
+    )
 
 Get the best parameters of the study.
+For further information see the [best_params](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.best_params) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to get the best parameters from. (see [Study](@ref))
@@ -247,9 +266,12 @@ function best_params(study::Study)
 end
 
 """
-    best_value(study::Study)
+    best_value(
+        study::Study
+    )
 
 Get the best objective value of the study.
+For further information see the [best_value](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.best_value) in the Optuna python documentation.
 
 ## Arguments
 - `study::Study`: The study to get the best objective value from. (see [Study](@ref))
