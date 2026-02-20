@@ -80,23 +80,29 @@ struct TPESampler <: BaseSampler
         constraints_func::Union{Nothing,Function}=nothing,
         categorical_distance_func::Union{Nothing,Function}=nothing,
     )
-        sampler = optuna.samplers.TPESampler(;
-            consider_prior=consider_prior,
-            prior_weight=prior_weight,
-            consider_magic_clip=consider_magic_clip,
-            consider_endpoints=consider_endpoints,
-            n_startup_trials=n_startup_trials,
-            n_ei_candidates=n_ei_candidates,
-            gamma=isnothing(gamma) ? nothing : gamma,
-            weights=isnothing(weights) ? nothing : weights,
-            seed=convert_seed(seed),
-            multivariate=multivariate,
-            group=group,
-            warn_independent_sampling=warn_independent_sampling,
-            constant_liar=constant_liar,
-            constraints_func=constraints_func,
-            categorical_distance_func=categorical_distance_func,
+        kwargs = Dict{Symbol,Any}(
+            :consider_prior => consider_prior,
+            :prior_weight => prior_weight,
+            :consider_magic_clip => consider_magic_clip,
+            :consider_endpoints => consider_endpoints,
+            :n_startup_trials => n_startup_trials,
+            :n_ei_candidates => n_ei_candidates,
+            :seed => convert_seed(seed),
+            :multivariate => multivariate,
+            :group => group,
+            :warn_independent_sampling => warn_independent_sampling,
+            :constant_liar => constant_liar,
+            :constraints_func => constraints_func,
+            :categorical_distance_func => categorical_distance_func,
         )
+        if !isnothing(gamma)
+            kwargs[:gamma] = gamma
+        end
+        if !isnothing(weights)
+            kwargs[:weights] = weights
+        end
+
+        sampler = optuna.samplers.TPESampler(; kwargs...)
         return new(sampler)
     end
 end
@@ -172,7 +178,7 @@ For further information see the [CmaEsSampler](https://optuna.readthedocs.io/en/
 
 ## Arguments
 - `x0::Union{Nothing,Dict{String,Any}}=nothing`: A dictionary of an initial parameter values for CMA-ES. By default, the mean of low and high for each distribution is used. Note that `x0` is sampled uniformly within the search space domain for each restart if you specify restart_strategy argument.
-- `sigma0::Union{Nothing,Float64}=nothing`: Initial standard deviation of CMA-ES. By default, `sigma0` is set to min_range / 6, where min_range denotes the minimum range of the distributions in the search space.   
+- `sigma0::Union{Nothing,Float64}=nothing`: Initial standard deviation of CMA-ES. By default, `sigma0` is set to min_range / 6, where min_range denotes the minimum range of the distributions in the search space.
 - `n_startup_trials::Int=1`: The independent sampling is used instead of the CMA-ES algorithm until the given number of trials finish in the same study.
 - `independent_sampler::Union{Nothing,BaseSampler}=nothing`: A BaseSampler instance that is used for independent sampling. The parameters not contained in the relative search space are sampled by this sampler. The search space for CmaEsSampler is determined by `intersection_search_space()`. If `nothing` is specified, [RandomSampler](@ref) is used as the default.
 - `warn_independent_sampling::Bool=true`: If this is `true`, a warning message is emitted when the value of a parameter is sampled by using an independent sampler. Note that the parameters of the first trial in a study are always sampled via an independent sampler, so no warning messages are emitted in this case.
@@ -372,7 +378,7 @@ end
 
 """
     GridSampler(
-        search_space::Dict{String,Vector}, 
+        search_space::Dict{String,Vector},
         seed::Union{Nothing,Integer}=nothing
     )
 
@@ -445,7 +451,7 @@ end
 
 """
     BruteForceSampler(
-        seed::Union{Nothing,Integer}=nothing, 
+        seed::Union{Nothing,Integer}=nothing,
         avoid_premature_stop::Bool=false
     )
 
@@ -472,7 +478,7 @@ end
 
 """
     PartialFixedSampler(
-        fixed_params::Dict{String,Any}, 
+        fixed_params::Dict{String,Any},
         base_sampler::BaseSampler)
 
 Sampler with partially fixed parameters.

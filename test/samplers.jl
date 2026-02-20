@@ -7,7 +7,7 @@ function test_sampler(sampler::Optuna.BaseSampler; finite_search_space::Bool=fal
     study, test_dir = create_test_study(; sampler=sampler)
 
     # run a few trials and verify parameter suggestions work
-    for _ in 1:3
+    for _ in 1:10
         trial = ask(study)
 
         x = 1.0
