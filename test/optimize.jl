@@ -74,6 +74,15 @@
             return result
         end
 
+        # test that optimize throws an error if the objective does not accept the parameters
+        @test_throws ErrorException optimize(
+            study2,
+            objective_kwargs,
+            (x=:error, y=y_i, z=z_i);
+            n_trials=5,
+            n_jobs=1,
+            verbose=false,
+        )
         optimize(
             study2,
             objective_kwargs,

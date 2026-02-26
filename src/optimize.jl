@@ -92,16 +92,19 @@ function run_trial(
 
         for k in keys(params)
             v = params[k]
-            if v[1] isa Signed
-                args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
-            elseif v[1] isa AbstractFloat
-                args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
-            elseif v isa Vector
-                args_fn[k] = suggest_categorical(trial, string(k), v)
+            if v isa Vector
+                if v[1] isa Signed
+                    args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
+                elseif v[1] isa AbstractFloat
+                    args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
+                else
+                    args_fn[k] = suggest_categorical(trial, string(k), v)
+                end
             else
                 error(
-                    "Unsupported parameter type for key: $k => value $(typeof(v)). " *
-                    "Possible types are Int, AbstractFloat, and Vector.",
+                    "Parameter values must be passed as a vector of length 2 for `Int` " *
+                    "and `Float` parameters or as a vector of any length for " *
+                    "`Categorical` parameters.",
                 )
             end
         end
