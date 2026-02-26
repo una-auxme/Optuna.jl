@@ -5,11 +5,11 @@
 
 """
     suggest_int(
-        trial::Trial, 
-        name::String, 
-        low::T, 
+        trial::Trial,
+        name::String,
+        low::T,
         high::T;
-        step::T=1, 
+        step::T=1,
         log::Bool=false
     ) where {T<:Signed}
 
@@ -127,9 +127,9 @@ end
 
 """
     suggest_categorical(
-        trial::Trial, 
-        name::String, 
-        choices::Vector{T}
+        trial::Trial,
+        name::String,
+        choices::Union{Vector{T},Tuple{Vararg{T}}}
     ) where {T<:Union{Bool,Int,AbstractFloat,String}}
 
 Suggest a categorical value for the given parameter name from the specified choices.
@@ -138,18 +138,18 @@ For further information see the [suggest_categorical](https://optuna.readthedocs
 ## Arguments
 - `trial::Trial`: The trial to suggest the parameter for. (see [Trial](@ref))
 - `name::String`: The name of the parameter to suggest.
-- `choices::Vector{T}`: The choices to suggest from.
+- `choices::Union{Vector{T},Tuple{Vararg{T}}}`: The choices to suggest from.
 
 ## Returns
 - `T`: Suggested categorical value.
 """
 function suggest_categorical(
-    trial::Trial{false}, name::String, choices::Vector{T}
+    trial::Trial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T<:Union{Bool,Int,AbstractFloat,String}}
     return pyconvert(T, trial.trial.suggest_categorical(name, choices))
 end
 function suggest_categorical(
-    trial::Trial{true}, name::String, choices::Vector{T}
+    trial::Trial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T<:Union{Bool,Int,AbstractFloat,String}}
     thread_safe() do
         return pyconvert(T, trial.trial.suggest_categorical(name, choices))
@@ -158,8 +158,8 @@ end
 
 """
     report(
-        trial::Trial, 
-        value::AbstractFloat, 
+        trial::Trial,
+        value::AbstractFloat,
         step::Int
     )
 

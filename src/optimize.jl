@@ -92,7 +92,7 @@ function run_trial(
 
         for k in keys(params)
             v = params[k]
-            if v isa Vector
+            if v isa Union{Vector,Tuple{Vararg}}
                 if v[1] isa Signed
                     args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
                 elseif v[1] isa AbstractFloat
@@ -102,9 +102,9 @@ function run_trial(
                 end
             else
                 error(
-                    "Parameter values must be passed as a vector of length 2 for `Int` " *
-                    "and `Float` parameters or as a vector of any length for " *
-                    "`Categorical` parameters.",
+                    "Parameter values must be passed as a vector or tuple of length 2 " *
+                    "for `Int` and `Float` parameters or as a vector or tuple of any " *
+                    "length for `Categorical` parameters.",
                 )
             end
         end
