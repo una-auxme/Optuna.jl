@@ -9,7 +9,11 @@ y_i = [-10.0f0, 10.0f0]
 z_i = [true, false]
 param = 5.0
 
-function objective(study, trial::Trial; x, y, z)
+function objective(study, trial::Trial)
+    x = suggest_int(trial, "x", x_i[1], x_i[2])
+    y = suggest_float(trial, "y", y_i[1], y_i[2])
+    z = suggest_categorical(trial, "z", z_i)
+
     result = 0.0
     for step in 1:10
         result = z ? x * (y - param) : x * (y + param)
@@ -29,11 +33,11 @@ end
 function test_optimize_permutations(n_jobs, verbose)
     study, test_dir = create_test_study(; study_name="optimize-$(n_jobs)-$(verbose)")
 
-    obj = function (trial; x, y, z)
-        return objective(study, trial; x=x, y=y, z=z)
+    obj = function (trial)
+        return objective(study, trial)
     end
 
-    optimize(study, obj, (x=x_i, y=y_i, z=z_i); n_trials=10, n_jobs=n_jobs, verbose=verbose)
+    optimize(study, obj; n_trials=10, n_jobs=n_jobs, verbose=verbose)
 
     #@test best_value(study) < 0.0
 

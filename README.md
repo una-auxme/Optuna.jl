@@ -49,12 +49,16 @@ study = Study(
     load_if_exists=true,
 )
 
-function objective(trial::Trial; x, y, z)
+function objective(trial::Trial)
+    x = suggest_int(trial, "x", 0, 100)
+    y = suggest_float(trial, "y", -10.0, 10.0)
+    z = suggest_categorical(trial, "z", [true, false])
+
     result = z ? x * (y - param) : x * (y + param)
     return result
 end
 
-optimize(study, objective, (x=[0, 100], y=[-10.0f0, 10.0f0], z=[true, false]); n_trials=10, n_jobs=1, verbose=true)
+optimize(study, objective; n_trials=10, n_jobs=1, verbose=true)
 
 println("Best params: ", best_params(study))
 println("Best value: ", best_value(study))
