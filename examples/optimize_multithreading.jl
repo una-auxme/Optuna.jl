@@ -15,7 +15,7 @@ artifact_path = "examples/artifacts"
 
 # parameter search space
 x_i = [0, 100]
-y_i = [-10.0f0, 10.0f0]
+y_i = [-10.0, 10.0]
 z_i = [true, false]
 param = 5.0
 
@@ -44,7 +44,11 @@ study = Study(
 )
 
 # Step 4: Define objective function
-function objective(trial::Trial; x, y, z)
+function objective(trial::Trial)
+    x = suggest_int(trial, "x", x_i[1], x_i[2])
+    y = suggest_float(trial, "y", y_i[1], y_i[2])
+    z = suggest_categorical(trial, "z", z_i)
+
     result = 0.0
     for step in 1:10
         result = z ? x * (y - param) : x * (y + param)
@@ -71,7 +75,7 @@ else
 end
 
 # Step 5: Optimize the study
-@time optimize(study, objective, (x=x_i, y=y_i, z=z_i); n_trials=20, n_jobs=4, verbose=true)
+@time optimize(study, objective; n_trials=20, n_jobs=4, verbose=true)
 
 # Step 6: Retrieve best trial information
 println("Best trial: ", best_trial(study))

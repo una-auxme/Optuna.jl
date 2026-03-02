@@ -94,9 +94,14 @@
         @test i in [1, 2, 3]
 
         # float choices
-        i = suggest_categorical(trial, "f", [-Inf, pi, 1e14])
-        @test i isa AbstractFloat
-        @test i in [-Inf, pi, 1e14]
+        f = suggest_categorical(trial, "f", [-Inf, pi, 1e14])
+        @test f isa AbstractFloat
+        @test f in [-Inf, pi, 1e14]
+
+        # choices as tuple
+        ti = suggest_categorical(trial, "t", (1, 2, 3))
+        @test ti isa Int
+        @test ti in (1, 2, 3)
 
         tell(study, trial, 1.0)
     end
