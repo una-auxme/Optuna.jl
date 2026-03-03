@@ -103,6 +103,20 @@
         @test ti isa Int
         @test ti in (1, 2, 3)
 
+        # choices as functions
+        func = suggest_categorical(trial, "func", [sin, cos, tan])
+        @test func isa Function
+        @test func in [sin, cos, tan]
+
+        # choices as structs
+        struct TestStruct
+            a::Int
+            b::AbstractFloat
+        end
+        s = suggest_categorical(trial, "s", [TestStruct(1, 2.f0), TestStruct(3, 4.0)])
+        @test isstructtype(typeof(s))
+        @test s in [TestStruct(1, 2.f0), TestStruct(3, 4.0)]
+
         tell(study, trial, 1.0)
     end
 

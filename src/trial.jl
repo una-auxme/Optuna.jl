@@ -156,6 +156,23 @@ function suggest_categorical(
     end
 end
 
+function suggest_categorical(
+    trial::Trial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    choices_str = string.(nameof.(typeof.(choices)))
+    choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
+    return choices[findfirst(==(choice), choices_str)]
+end
+function suggest_categorical(
+    trial::Trial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    thread_safe() do
+    choices_str = string.(nameof.(typeof.(choices)))
+    choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
+    return choices[findfirst(==(choice), choices_str)]
+    end
+end
+
 """
     report(
         trial::Trial,
