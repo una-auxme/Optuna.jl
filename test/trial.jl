@@ -78,6 +78,12 @@
     @testset "suggest_categorical" begin
         study, test_dir = create_test_study(; study_name="suggest_cat_test")
 
+        # used for testing struct types as choices for suggest_categorical
+        struct TestStruct
+            a::Int
+            b::AbstractFloat
+        end
+
         function suggest_categorical_tests(trial::Trial)
 
             # string choices
@@ -109,11 +115,7 @@
             @test func isa Function
             @test func in [sin, cos, tan]
 
-            # choices as structs
-            struct TestStruct
-                a::Int
-                b::AbstractFloat
-            end
+            # choices as structs for suggest_categorical
             s = suggest_categorical(trial, "s", [TestStruct(1, 2.0f0), TestStruct(3, 4.0)])
             @test isstructtype(typeof(s))
             @test s in [TestStruct(1, 2.0f0), TestStruct(3, 4.0)]
