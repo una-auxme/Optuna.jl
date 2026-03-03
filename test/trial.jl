@@ -80,9 +80,13 @@
     end
 
     @testset "suggest_categorical" begin
-        create_test_study(; study_name="suggest_cat_test") do study, _
-            trial = ask(study)
+        # used for testing struct types as choices for suggest_categorical
+        struct TestStruct
+            a::Int
+            b::AbstractFloat
+        end
 
+        function suggest_categorical_tests(trial::Trial)
             # string choices
             z = suggest_categorical(trial, "z", ["a", "b", "c"])
             @test z isa String
@@ -107,6 +111,28 @@
             @test ti isa Int
             @test ti in (1, 2, 3)
 
+            # choices as functions
+            func = suggest_categorical(trial, "func", [sin, cos, tan])
+            @test func isa Function
+            @test func in [sin, cos, tan]
+
+            # choices as structs for suggest_categorical
+            s = suggest_categorical(trial, "s", [TestStruct(1, 2.0f0), TestStruct(3, 4.0)])
+            @test isstructtype(typeof(s))
+            @test s in [TestStruct(1, 2.0f0), TestStruct(3, 4.0)]
+
+            return nothing
+        end
+
+        create_test_study(; study_name="suggest_cat_test") do study, _
+            # single_threading
+            trial = ask(study; multithreading=false)
+            suggest_categorical_tests(trial)
+            tell(study, trial, 1.0)
+
+            # multi_threading
+            trial = ask(study; multithreading=true)
+            suggest_categorical_tests(trial)
             tell(study, trial, 1.0)
         end
     end
