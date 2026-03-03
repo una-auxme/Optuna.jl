@@ -40,10 +40,13 @@ function create_test_study(
         load_if_exists=true,
     )
 
-    internal(study, path)
+    try
+        internal(study, path)
+    finally
+        Sys.iswindows() && study.study._storage._backend.engine.dispose()
+        rm(path; recursive=true)
+    end
 
-    Sys.iswindows() && study.study._storage._backend.engine.dispose()
-    rm(path; recursive=true)
     return nothing
 end
 
