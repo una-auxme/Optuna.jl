@@ -177,17 +177,19 @@ For further information see the [suggest_categorical](https://optuna.readthedocs
 function suggest_categorical(
     trial::Trial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
-    choices_str = string.(nameof.(typeof.(choices)))
+    choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
     choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
-    return choices[findfirst(==(choice), choices_str)]
+    choice_idx = parse(Int, split(choice, '|')[1])
+    return choices[choice_idx]
 end
 function suggest_categorical(
     trial::Trial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
     thread_safe() do
-        choices_str = string.(nameof.(typeof.(choices)))
+        choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
         choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
-        return choices[findfirst(==(choice), choices_str)]
+        choice_idx = parse(Int, split(choice, '|')[1])
+        return choices[choice_idx]
     end
 end
 
