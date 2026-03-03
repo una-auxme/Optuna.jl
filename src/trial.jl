@@ -156,6 +156,24 @@ function suggest_categorical(
     end
 end
 
+"""
+    suggest_categorical(
+        trial::Trial,
+        name::String,
+        choices::Union{Vector{T},Tuple{Vararg{T}}}
+    ) where {T}
+
+Suggest a categorical value for the given parameter name from the specified choices.
+For further information see the [suggest_categorical](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.suggest_categorical) in the Optuna python documentation.
+
+## Arguments
+- `trial::Trial`: The trial to suggest the parameter for. (see [Trial](@ref))
+- `name::String`: The name of the parameter to suggest.
+- `choices::Union{Vector{T},Tuple{Vararg{T}}}`: The choices to suggest from.
+
+## Returns
+- `T`: Suggested categorical value.
+"""
 function suggest_categorical(
     trial::Trial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
@@ -167,9 +185,9 @@ function suggest_categorical(
     trial::Trial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
     thread_safe() do
-    choices_str = string.(nameof.(typeof.(choices)))
-    choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
-    return choices[findfirst(==(choice), choices_str)]
+        choices_str = string.(nameof.(typeof.(choices)))
+        choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
+        return choices[findfirst(==(choice), choices_str)]
     end
 end
 
