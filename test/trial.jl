@@ -77,32 +77,60 @@
 
     @testset "suggest_categorical" begin
         study, test_dir = create_test_study(; study_name="suggest_cat_test")
-        trial = ask(study)
 
-        # string choices
-        z = suggest_categorical(trial, "z", ["a", "b", "c"])
-        @test z isa String
-        @test z in ["a", "b", "c"]
+        # used for testing struct types as choices for suggest_categorical
+        struct TestStruct
+            a::Int
+            b::AbstractFloat
+        end
 
-        # bool choices
-        b = suggest_categorical(trial, "b", [true, false])
-        @test b isa Bool
+        function suggest_categorical_tests(trial::Trial)
 
-        # int choices
-        i = suggest_categorical(trial, "i", [1, 2, 3])
-        @test i isa Int
-        @test i in [1, 2, 3]
+            # string choices
+            z = suggest_categorical(trial, "z", ["a", "b", "c"])
+            @test z isa String
+            @test z in ["a", "b", "c"]
 
-        # float choices
-        f = suggest_categorical(trial, "f", [-Inf, pi, 1e14])
-        @test f isa AbstractFloat
-        @test f in [-Inf, pi, 1e14]
+            # bool choices
+            b = suggest_categorical(trial, "b", [true, false])
+            @test b isa Bool
 
-        # choices as tuple
-        ti = suggest_categorical(trial, "t", (1, 2, 3))
-        @test ti isa Int
-        @test ti in (1, 2, 3)
+            # int choices
+            i = suggest_categorical(trial, "i", [1, 2, 3])
+            @test i isa Int
+            @test i in [1, 2, 3]
 
+            # float choices
+            f = suggest_categorical(trial, "f", [-Inf, pi, 1e14])
+            @test f isa AbstractFloat
+            @test f in [-Inf, pi, 1e14]
+
+            # choices as tuple
+            ti = suggest_categorical(trial, "t", (1, 2, 3))
+            @test ti isa Int
+            @test ti in (1, 2, 3)
+
+            # choices as functions
+            func = suggest_categorical(trial, "func", [sin, cos, tan])
+            @test func isa Function
+            @test func in [sin, cos, tan]
+
+            # choices as structs for suggest_categorical
+            s = suggest_categorical(trial, "s", [TestStruct(1, 2.0f0), TestStruct(3, 4.0)])
+            @test isstructtype(typeof(s))
+            @test s in [TestStruct(1, 2.0f0), TestStruct(3, 4.0)]
+
+            return nothing
+        end
+
+        # single_threading
+        trial = ask(study; multithreading=false)
+        suggest_categorical_tests(trial)
+        tell(study, trial, 1.0)
+
+        # multi_threading
+        trial = ask(study; multithreading=true)
+        suggest_categorical_tests(trial)
         tell(study, trial, 1.0)
     end
 
