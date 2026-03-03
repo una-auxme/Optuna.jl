@@ -26,25 +26,25 @@
     end
 
     @testset "upload and download artifact" begin
-        study, test_dir = create_test_study(; study_name="artifact_test")
+        create_test_study(; study_name="artifact_test") do study, test_dir
+            # create a trial and upload artifact
+            trial = ask(study)
+            data = Dict("model_weights" => [1.0, 2.0, 3.0], "epoch" => 10)
+            upload_artifact(study, trial, data)
+            tell(study, trial, 1.0)
 
-        # create a trial and upload artifact
-        trial = ask(study)
-        data = Dict("model_weights" => [1.0, 2.0, 3.0], "epoch" => 10)
-        upload_artifact(study, trial, data)
-        tell(study, trial, 1.0)
+            # get artifact metadata
+            metas = get_all_artifact_meta(study)
+            @test length(metas) == 1
+            @test metas[1] isa ArtifactMeta
+            @test !isempty(metas[1].artifact_id)
 
-        # get artifact metadata
-        metas = get_all_artifact_meta(study)
-        @test length(metas) == 1
-        @test metas[1] isa ArtifactMeta
-        @test !isempty(metas[1].artifact_id)
+            # download artifact (file_path prefix + artifact_id + .jld2)
+            download_prefix = joinpath(test_dir, "artifact_")
+            download_artifact(study, metas[1].artifact_id, download_prefix)
 
-        # download artifact (file_path prefix + artifact_id + .jld2)
-        download_prefix = joinpath(test_dir, "artifact_")
-        download_artifact(study, metas[1].artifact_id, download_prefix)
-
-        downloaded_file = abspath(download_prefix) * metas[1].artifact_id * ".jld2"
-        @test isfile(downloaded_file)
+            downloaded_file = abspath(download_prefix) * metas[1].artifact_id * ".jld2"
+            @test isfile(downloaded_file)
+        end
     end
 end

@@ -5,53 +5,52 @@
 
 @testset "study" begin
     @testset "Study construction" begin
-        study, test_dir = create_test_study(; study_name="construct_test")
-        @test study isa Study
+        create_test_study(; study_name="construct_test") do study, _
+            @test study isa Study
+        end
     end
 
     @testset "Study direction" begin
         # minimize (default)
-        study, test_dir = create_test_study(;
-            study_name="minimize_test", direction="minimize"
-        )
-        @test study isa Study
+        create_test_study(; study_name="minimize_test", direction="minimize") do study, _
+            @test study isa Study
+        end
 
         # maximize
-        study, test_dir = create_test_study(;
-            study_name="maximize_test", direction="maximize"
-        )
-        @test study isa Study
+        create_test_study(; study_name="maximize_test", direction="maximize") do study, _
+            @test study isa Study
+        end
 
         # invalid direction should error
-        @test_throws ErrorException create_test_study(;
-            study_name="invalid_test", direction="invalid"
+        @test_throws ErrorException create_test_study(
+            (_, _) -> nothing; study_name="invalid_test", direction="invalid"
         )
     end
 
     @testset "ask/tell workflow" begin
-        study, test_dir = create_test_study(; study_name="ask_tell_test")
+        create_test_study(; study_name="ask_tell_test") do study, _
+            trial = ask(study)
+            @test trial isa Trial
 
-        trial = ask(study)
-        @test trial isa Trial
-
-        x = suggest_float(trial, "x", 0.0, 10.0)
-        tell(study, trial, x)
+            x = suggest_float(trial, "x", 0.0, 10.0)
+            tell(study, trial, x)
+        end
     end
 
     @testset "best_trial, best_params, best_value" begin
-        study, test_dir = create_test_study(; study_name="best_test")
+        create_test_study(; study_name="best_test") do study, _
+            # run a few trials
+            for value in [5.0, 3.0, 7.0]
+                trial = ask(study)
+                suggest_float(trial, "x", 0.0, 10.0)
+                tell(study, trial, value)
+            end
 
-        # run a few trials
-        for value in [5.0, 3.0, 7.0]
-            trial = ask(study)
-            suggest_float(trial, "x", 0.0, 10.0)
-            tell(study, trial, value)
+            @test best_value(study) == 3.0  # minimize, so lowest is best
+            @test best_value(study) isa Float64
+            @test best_params(study) isa Dict{String,Any}
+            @test best_trial(study) isa Trial
         end
-
-        @test best_value(study) == 3.0  # minimize, so lowest is best
-        @test best_value(study) isa Float64
-        @test best_params(study) isa Dict{String,Any}
-        @test best_trial(study) isa Trial
     end
 
     @testset "load_study" begin
@@ -69,6 +68,12 @@
             "load_test", storage, artifacts; sampler=RandomSampler(42), pruner=NopPruner()
         )
         @test best_value(study2) == 42.0
+
+        if Sys.iswindows()
+            study1.study._storage._backend.engine.dispose()
+            study2.study._storage._backend.engine.dispose()
+        end
+        rm(test_dir; recursive=true)
     end
 
     @testset "delete_study" begin
@@ -98,16 +103,22 @@
         copy_study("original", storage1, storage2)
         study2 = load_study("original", storage2, artifacts)
         @test best_value(study2) == 99.0
+
+        if Sys.iswindows()
+            study1.study._storage._backend.engine.dispose()
+            study2.study._storage._backend.engine.dispose()
+        end
+        rm(test_dir; recursive=true)
     end
 
     @testset "tell with prune" begin
-        study, test_dir = create_test_study(; study_name="prune_tell_test")
+        create_test_study(; study_name="prune_tell_test") do study, _
+            trial = ask(study)
+            tell(study, trial; prune=true)
 
-        trial = ask(study)
-        tell(study, trial; prune=true)
-
-        # pruned trial should not have a value, so best_value should error
-        # (no completed trials)
-        @test_throws Exception best_value(study)
+            # pruned trial should not have a value, so best_value should error
+            # (no completed trials)
+            @test_throws Exception best_value(study)
+        end
     end
 end
