@@ -31,17 +31,17 @@ end
 
 # Optimize the objective function of the study with a set of parameters suggested by the sampler
 function test_optimize_permutations(n_jobs, verbose)
-    study, test_dir = create_test_study(; study_name="optimize-$(n_jobs)-$(verbose)")
+    create_test_study(; study_name="optimize-$(n_jobs)-$(verbose)") do study, test_dir
+        obj = function (trial)
+            return objective(study, trial)
+        end
 
-    obj = function (trial)
-        return objective(study, trial)
+        optimize(study, obj; n_trials=10, n_jobs=n_jobs, verbose=verbose)
+
+        #@test best_value(study) < 0.0
+
+        return nothing
     end
-
-    optimize(study, obj; n_trials=10, n_jobs=n_jobs, verbose=verbose)
-
-    #@test best_value(study) < 0.0
-
-    return nothing
 end
 
 @testset "optimize_multithreading" begin
