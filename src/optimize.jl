@@ -6,8 +6,7 @@
 """
     optimize(
         study::Study,
-        objective::Function,
-        params::Union{Nothing,NamedTuple}=nothing;
+        objective::Function;
         n_trials::Int=100,
         verbose::Bool=false,
         n_jobs::Integer=1,
@@ -22,7 +21,6 @@ If the objective function returns `nothing`, the trial is pruned.
 ## Arguments
 - `study::Study`: [Study](@ref) that should be optimized.
 - `objective::Function`: Function that takes a trial and returns a score.
-- `params::Union{Nothing,NamedTuple}=nothing`: Named tuple of parameters to optimize. If `nothing`, the objective function is expected to handle the parameter suggestion internally. If a `NamedTuple` is passed, the objective function is expected to take the parameters as keyword arguments or as a `NamedTuple` (see examples).
 
 ## Keyword Arguments
 - `n_trials::Int=100`: Number of trials to run.
@@ -34,8 +32,7 @@ If the objective function returns `nothing`, the trial is pruned.
 """
 function optimize(
     study::Study,
-    objective::Function,
-    params::Union{Nothing,NamedTuple}=nothing;
+    objective::Function;
     n_trials::Int=100,
     verbose::Bool=false,
     n_jobs::Integer=1,
@@ -57,66 +54,29 @@ function optimize(
 
     if n_jobs == 1
         return optimize_singlethreading(
-            study, objective, params; n_trials=n_trials, verbose=verbose
+            study, objective; n_trials=n_trials, verbose=verbose
         )
     else
-        return optimize_multithreading(
-            study, objective, params; n_trials=n_trials, verbose=verbose
-        )
+        return optimize_multithreading(study, objective; n_trials=n_trials, verbose=verbose)
     end
 end
 
 """
     run_trial(
         study::Study,
-        trial::Trial,
-        params::NamedTuple;
+        trial::Trial;
         objective::Function
     )
 
-Extract the suggested parameters from the trial and run the objective function with these parameters. Then, report the result of the trial to the study. If the score is `nothing`, the trial is pruned.
+Run the objective function with the given trial. Then, report the result of the trial to the study. If the score is `nothing`, the trial is pruned.
 
 ## Arguments
 - `study::Study`: [Study](@ref) to which the `trial` belongs.
 - `trial::Trial`: The trial for which the parameters are suggested and the objective function is run. (see [Trial](@ref))
-- `params::NamedTuple`: Named tuple of parameters to optimize.
 - `objective::Function`: Function that takes a trial and returns a score.
 """
-function run_trial(
-    study::Study, trial::Trial, params::Union{Nothing,NamedTuple}, objective::Function
-)
-    if isnothing(params)
-        score = objective(trial)
-    else
-        args_fn = Dict{Symbol,Any}()
-
-        for k in keys(params)
-            v = params[k]
-            if v isa Union{Vector,Tuple{Vararg}}
-                if v[1] isa Signed
-                    args_fn[k] = suggest_int(trial, string(k), v[1], v[2])
-                elseif v[1] isa AbstractFloat
-                    args_fn[k] = suggest_float(trial, string(k), v[1], v[2])
-                else
-                    args_fn[k] = suggest_categorical(trial, string(k), v)
-                end
-            else
-                error(
-                    "Parameter values must be passed as a vector or tuple of length 2 " *
-                    "for `Int` and `Float` parameters or as a vector or tuple of any " *
-                    "length for `Categorical` parameters.",
-                )
-            end
-        end
-
-        if hasmethod(objective, (Trial, NamedTuple))
-            score = objective(
-                trial, NamedTuple((Symbol(key), value) for (key, value) in args_fn)
-            )
-        else
-            score = objective(trial; args_fn...)
-        end
-    end
+function run_trial(study::Study, trial::Trial, objective::Function)
+    score = objective(trial)
 
     if isnothing(score)
         tell(study, trial; prune=true)
@@ -128,13 +88,12 @@ end
 """
     optimize_singlethreading(
         study::Study,
-        objective::Function,
-        params::Union{Nothing,NamedTuple};
+        objective::Function;
         n_trials::Int=100,
         verbose::Bool=false,
     )
 
-Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+Optimize the objective function.
 
 Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
 
@@ -143,7 +102,6 @@ This function works in a single-threaded way and is used when the keyword argume
 ## Arguments
 - `study::Study`: [Study](@ref) to which the `trial` belongs.
 - `objective::Function`: Function that takes a trial and returns a score.
-- `params::NamedTuple`: Named tuple of parameters to optimize. If `nothing`, the objective function is expected to handle the parameter suggestion internally. If a `NamedTuple` is passed, the objective function is expected to take the parameters as keyword arguments or as a `NamedTuple` (see examples).
 
 ## Keyword Arguments
 - `n_trials::Int=100`: Number of trials to run.
@@ -153,11 +111,7 @@ This function works in a single-threaded way and is used when the keyword argume
 - `Study`: The optimized study. [Study](@ref)
 """
 function optimize_singlethreading(
-    study::Study,
-    objective::Function,
-    params::Union{Nothing,NamedTuple};
-    n_trials::Int=100,
-    verbose::Bool=false,
+    study::Study, objective::Function; n_trials::Int=100, verbose::Bool=false
 )
     for i in 1:n_trials
         if verbose
@@ -166,7 +120,7 @@ function optimize_singlethreading(
 
         trial = ask(study; multithreading=false)
 
-        run_trial(study, trial, params, objective)
+        run_trial(study, trial, objective)
     end
 
     return study
@@ -175,13 +129,12 @@ end
 """
     optimize_multithreading(
         study::Study,
-        objective::Function,
-        params::Union{Nothing,NamedTuple};
+        objective::Function;
         n_trials::Int=100,
         verbose::Bool=false,
     )
 
-Optimize the objective function by choosing a suitable set of hyperparameter values from the given params.
+Optimize the objective function.
 
 Uses the sampler of the study which implements the task of value suggestion based on a specified distribution. For the available samplers see [Sampler](@ref).
 
@@ -190,7 +143,6 @@ This function works in a multi-threaded way and is used when the keyword argumen
 ## Arguments
 - `study::Study`: [Study](@ref) to which the `trial` belongs.
 - `objective::Function`: Function that takes a trial and returns a score.
-- `params::Union{Nothing,NamedTuple}`: Named tuple of parameters to optimize. If `nothing`, the objective function is expected to handle the parameter suggestion internally. If a `NamedTuple` is passed, the objective function is expected to take the parameters as keyword arguments or as a `NamedTuple` (see examples).
 
 ## Keyword Arguments
 - `n_trials::Int=100`: Number of trials to run.
@@ -200,11 +152,7 @@ This function works in a multi-threaded way and is used when the keyword argumen
 - `Study`: The optimized study. [Study](@ref)
 """
 function optimize_multithreading(
-    study::Study,
-    objective::Function,
-    params::Union{Nothing,NamedTuple};
-    n_trials::Int=100,
-    verbose::Bool=false,
+    study::Study, objective::Function; n_trials::Int=100, verbose::Bool=false
 )
     PythonCall.GIL.unlock() do
         Threads.@threads for i in 1:n_trials
@@ -214,7 +162,7 @@ function optimize_multithreading(
 
             trial = ask(study; multithreading=true)
 
-            run_trial(study, trial, params, objective)
+            run_trial(study, trial, objective)
         end
     end
 
