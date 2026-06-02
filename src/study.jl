@@ -343,7 +343,9 @@ Single-objective studies return a one-element vector.
 - `Vector{String}`: Each element is "minimize" or "maximize".
 """
 function directions(study::Study)
-    return pyconvert(Vector{String}, study.study.directions)
+    let dirs = pyconvert(Vector{Int64}, study.study.directions)
+      [dir == 1 ? "minimize" : "maximize" for dir in dirs]
+    end
 end
 
 """
