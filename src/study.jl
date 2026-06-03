@@ -190,6 +190,24 @@ function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
     end
 end
 
+function _validate_objectives(study::Study, objectives)
+    isnothing(objectives) && return
+    n_dirs = pyconvert(Int, study.study.directions.__len__())
+    if objectives isa Vector
+        length(objectives) == n_dirs || throw(
+            ArgumentError(
+                "The number of objectives ($(length(objectives))) does not match the number of directions provided ($n_dirs)."
+            )
+        )
+    else
+        n_dirs == 1 || throw(
+            ArgumentError(
+                "A scalar objective was provided but the study has multiple directions ($n_dirs)."
+            )
+        )
+    end
+end
+
 """
     tell(
         study::Study,
@@ -221,6 +239,8 @@ function tell(
         )
     end
 
+    _validate_objectives(study, score)
+
     if prune
         study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
     else
@@ -241,6 +261,8 @@ function tell(
             ),
         )
     end
+
+    _validate_objectives(study, score)
 
     thread_safe() do
         if prune
@@ -343,9 +365,7 @@ Single-objective studies return a one-element vector.
 - `Vector{String}`: Each element is "minimize" or "maximize".
 """
 function directions(study::Study)
-    let dirs = pyconvert(Vector{Int64}, study.study.directions)
-      [dir == 1 ? "minimize" : "maximize" for dir in dirs]
-    end
+    return [lowercase(pyconvert(String, d.name)) for d in study.study.directions]
 end
 
 """
