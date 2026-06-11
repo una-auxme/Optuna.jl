@@ -20,8 +20,8 @@ study = Study(
     study_name,
     artifact_store,
     storage;
-    sampler=NSGAIISampler(population_size=50),
-    directions=["minimize", "minimize"]
+    sampler=NSGAIISampler(; population_size=50),
+    directions=["minimize", "minimize"],
 )
 
 # Step 4: Define objective functions

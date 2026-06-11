@@ -2,11 +2,12 @@
     storage = InMemoryStorage()
     artifact_store = FileSystemArtifactStore(mktempdir())
     study = Study(
-                "moo_unconstrained_test", 
-                artifact_store, 
-                storage;
-                sampler=NSGAIISampler(population_size=10),
-                directions=["minimize", "minimize"])
+        "moo_unconstrained_test",
+        artifact_store,
+        storage;
+        sampler=NSGAIISampler(; population_size=10),
+        directions=["minimize", "minimize"],
+    )
 
     obj1(x) = x^2
     obj2(x) = (x - 2)^2
@@ -29,7 +30,9 @@
     @test best_params_all(study) isa Vector{Dict{String,Any}}
     @test best_trials(study) isa Vector
 
-    @test length(best_trials(study)) == length(best_values(study)) == length(best_params_all(study))
+    @test length(best_trials(study)) ==
+        length(best_values(study)) ==
+        length(best_params_all(study))
 
     best_x = best_params_all(study)[1]["x"]
     @test best_x isa Float64

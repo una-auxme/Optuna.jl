@@ -48,8 +48,9 @@ function Study(
 
     if !isnothing(directions)
         for d in directions
-            d ∈ ("minimize", "maximize") ||
-                error("Each element of directions must be 'minimize' or 'maximize', got '$d'")
+            d ∈ ("minimize", "maximize") || error(
+                "Each element of directions must be 'minimize' or 'maximize', got '$d'"
+            )
         end
         study = optuna.create_study(;
             storage=storage.storage,
@@ -163,7 +164,7 @@ end
 
 """
     ask(
-        study::Study; 
+        study::Study;
         multithreading::Bool=Threads.nthreads() > 1
     )
 
@@ -191,19 +192,19 @@ function ask(study::Study; multithreading::Bool=Threads.nthreads() > 1)
 end
 
 function _validate_objectives(study::Study, objectives)
-    isnothing(objectives) && return
+    isnothing(objectives) && return nothing
     n_dirs = pyconvert(Int, study.study.directions.__len__())
     if objectives isa Vector
         length(objectives) == n_dirs || throw(
             ArgumentError(
-                "The number of objectives ($(length(objectives))) does not match the number of directions provided ($n_dirs)."
-            )
+                "The number of objectives ($(length(objectives))) does not match the number of directions provided ($n_dirs).",
+            ),
         )
     else
         n_dirs == 1 || throw(
             ArgumentError(
-                "A scalar objective was provided but the study has multiple directions ($n_dirs)."
-            )
+                "A scalar objective was provided but the study has multiple directions ($n_dirs).",
+            ),
         )
     end
 end
@@ -262,9 +263,8 @@ function tell(
         )
     end
 
-    _validate_objectives(study, score)
-
     thread_safe() do
+        _validate_objectives(study, score)
         if prune
             study.study.tell(trial.trial; state=optuna.trial.TrialState.PRUNED)
         else
@@ -288,9 +288,10 @@ For further information see the [best_trial](https://optuna.readthedocs.io/en/st
 - `Trial`: The best trial. (see [Trial](@ref))
 """
 function best_trial(study::Study)
-    pyconvert(Int, study.study.directions.__len__()) > 1 &&
-        error("best_trial() is not defined for multi-objective studies. " *
-              "Use best_trials() to get the Pareto front trials.")
+    pyconvert(Int, study.study.directions.__len__()) > 1 && error(
+        "best_trial() is not defined for multi-objective studies. " *
+        "Use best_trials() to get the Pareto front trials.",
+    )
     return Trial{false}(study.study.best_trial)
 end
 
@@ -309,9 +310,10 @@ For further information see the [best_params](https://optuna.readthedocs.io/en/s
 - `Dict{String,Any}`: The best parameters.
 """
 function best_params(study::Study)
-    pyconvert(Int, study.study.directions.__len__()) > 1 &&
-        error("best_params() is not defined for multi-objective studies. " *
-              "Use best_params_all() to get the parameters for all Pareto front trials.")
+    pyconvert(Int, study.study.directions.__len__()) > 1 && error(
+        "best_params() is not defined for multi-objective studies. " *
+        "Use best_params_all() to get the parameters for all Pareto front trials.",
+    )
     return pyconvert(Dict{String,Any}, study.study.best_params)
 end
 
@@ -346,9 +348,10 @@ For further information see the [best_value](https://optuna.readthedocs.io/en/st
 - `Float64`: The best objective value.
 """
 function best_value(study::Study)
-    pyconvert(Int, study.study.directions.__len__()) > 1 &&
-        error("best_value() is not defined for multi-objective studies. " *
-              "Use best_values() to get the Pareto front objective values.")
+    pyconvert(Int, study.study.directions.__len__()) > 1 && error(
+        "best_value() is not defined for multi-objective studies. " *
+        "Use best_values() to get the Pareto front objective values.",
+    )
     return pyconvert(Float64, study.study.best_value)
 end
 
