@@ -383,7 +383,7 @@ best trial in a vector.
 - `study::Study`: The study to query. (see [Study](@ref))
 """
 function best_trials(study::Study)
-    return pyconvert(Vector, study.study.best_trials)
+    return Trial{false}.(pyconvert(Vector, study.study.best_trials))
 end
 
 """
