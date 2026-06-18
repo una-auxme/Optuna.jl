@@ -31,20 +31,39 @@ For further information see the [suggest_int](https://optuna.readthedocs.io/en/s
 - `T`: Suggested integer value.
 """
 function suggest_int(
-    trial::Trial{false}, name::String, low::T, high::T; step::T=1, log::Bool=false
+    trial::Union{Trial{false},FixedTrial{false}},
+    name::String,
+    low::T,
+    high::T;
+    step::T=1,
+    log::Bool=false,
 ) where {T<:Signed}
     @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting an integer."
     return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
 end
 function suggest_int(
-    trial::Trial{true}, name::String, low::T, high::T; step::T=1, log::Bool=false
+    trial::Union{Trial{true},FixedTrial{true}},
+    name::String,
+    low::T,
+    high::T;
+    step::T=1,
+    log::Bool=false,
 ) where {T<:Signed}
     @assert !(step != 1 && log) "The parameters `step` and `log` cannot be used " *
         "at the same time when suggesting an integer."
     thread_safe() do
         return pyconvert(T, trial.trial.suggest_int(name, low, high; step=step, log=log))
     end
+end
+
+"""
+    is_frozen(trial::Trial)
+
+Check if the given trial wraps an Optuna frozen trial.
+"""
+function is_frozen(trial::Trial)
+    return pyconvert(Bool, PythonCall.pytype(trial.trial) == optuna.trial.FrozenTrial)
 end
 
 """
@@ -74,7 +93,7 @@ For further information see the [suggest_float](https://optuna.readthedocs.io/en
 - `Float64`: Suggested float value.
 """
 function suggest_float(
-    trial::Trial,
+    trial::Union{Trial,FixedTrial},
     name::String,
     low::T,
     high::T;
@@ -94,7 +113,7 @@ function suggest_float(
 end
 
 function suggest_float(
-    trial::Trial{false},
+    trial::Union{Trial{false},FixedTrial{false}},
     name::String,
     low::Float64,
     high::Float64;
@@ -109,7 +128,7 @@ function suggest_float(
 end
 
 function suggest_float(
-    trial::Trial{true},
+    trial::Union{Trial{true},FixedTrial{true}},
     name::String,
     low::Float64,
     high::Float64;
@@ -155,6 +174,18 @@ function suggest_categorical(
         return pyconvert(T, trial.trial.suggest_categorical(name, choices))
     end
 end
+function suggest_categorical(
+    trial::FixedTrial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T<:Union{Bool,Int,AbstractFloat,String}}
+    return pyconvert(T, trial.trial.suggest_categorical(name, choices))
+end
+function suggest_categorical(
+    trial::FixedTrial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T<:Union{Bool,Int,AbstractFloat,String}}
+    thread_safe() do
+        return pyconvert(T, trial.trial.suggest_categorical(name, choices))
+    end
+end
 
 """
     suggest_categorical(
@@ -177,20 +208,46 @@ For further information see the [suggest_categorical](https://optuna.readthedocs
 function suggest_categorical(
     trial::Trial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
-    choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
-    choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
-    choice_idx = parse(Int, split(choice, '|')[1])
-    return choices[choice_idx]
+    return _suggest_categorical(trial, name, choices)
 end
 function suggest_categorical(
     trial::Trial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
     thread_safe() do
-        choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
-        choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
-        choice_idx = parse(Int, split(choice, '|')[1])
-        return choices[choice_idx]
+        return _suggest_categorical(trial, name, choices)
     end
+end
+function suggest_categorical(
+    trial::FixedTrial{false}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    return _suggest_fixed_categorical(trial, name, choices)
+end
+function suggest_categorical(
+    trial::FixedTrial{true}, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    thread_safe() do
+        return _suggest_fixed_categorical(trial, name, choices)
+    end
+end
+
+function _suggest_categorical(
+    trial::Trial, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
+    choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
+    choice_idx = parse(Int, split(choice, '|')[1])
+    return choices[choice_idx]
+end
+function _suggest_fixed_categorical(
+    trial::FixedTrial, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
+) where {T}
+    haskey(trial.params, name) ||
+        throw(ArgumentError("FixedTrial does not contain parameter `$name`."))
+    value = trial.params[name]
+    for choice in choices
+        choice == value && return choice
+    end
+    throw(ArgumentError("FixedTrial parameter `$name` is not one of the provided choices."))
 end
 
 """
@@ -208,10 +265,12 @@ For further information see the [report](https://optuna.readthedocs.io/en/stable
 - `value::AbstractFloat`: The intermediate value to report.
 - `step::Int`: The step at which the value is reported.
 """
-function report(trial::Trial{false}, value::AbstractFloat, step::Int)
+function report(
+    trial::Union{Trial{false},FixedTrial{false}}, value::AbstractFloat, step::Int
+)
     return trial.trial.report(value; step=step)
 end
-function report(trial::Trial{true}, value::AbstractFloat, step::Int)
+function report(trial::Union{Trial{true},FixedTrial{true}}, value::AbstractFloat, step::Int)
     thread_safe() do
         return trial.trial.report(value; step=step)
     end
@@ -231,10 +290,10 @@ For further information see the [should_prune](https://optuna.readthedocs.io/en/
 ## Returns
 - `Bool`: `true` if the trial should be pruned, `false` otherwise.
 """
-function should_prune(trial::Trial{false})
+function should_prune(trial::Union{Trial{false},FixedTrial{false}})
     return Bool(trial.trial.should_prune())
 end
-function should_prune(trial::Trial{true})
+function should_prune(trial::Union{Trial{true},FixedTrial{true}})
     thread_safe() do
         return Bool(trial.trial.should_prune())
     end
