@@ -101,11 +101,15 @@ Study
 load_study
 delete_study
 copy_study
+directions
 ask
 tell
 best_trial
+best_trials
 best_params
+best_params_all
 best_value
+best_values
 upload_artifact
 get_all_artifact_meta
 download_artifact
