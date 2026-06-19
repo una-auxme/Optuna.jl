@@ -34,6 +34,9 @@
         fixed_categorical = FixedTrial(Dict("y" => "b"))
         @test suggest_categorical(fixed_categorical, "y", ["a", "b"]) == "b"
 
+        fixed_categorical_multithreaded = FixedTrial(Dict("y" => "b"); multithreading=true)
+        @test suggest_categorical(fixed_categorical_multithreaded, "y", ["a", "b"]) == "b"
+
         fixed_func = FixedTrial(Dict("func" => sin))
         @test suggest_categorical(fixed_func, "func", [sin, cos, tan]) == sin
 
