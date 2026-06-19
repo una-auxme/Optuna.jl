@@ -51,9 +51,8 @@
         @test suggest_categorical(fixed_struct, "s", [choice_a, choice_b]) == choice_b
 
         fixed_encoded_struct = FixedTrial(Dict("s" => "2|$choice_b"))
-        @test suggest_categorical(
-            fixed_encoded_struct, "s", [choice_a, choice_b]
-        ) == choice_b
+        @test suggest_categorical(fixed_encoded_struct, "s", [choice_a, choice_b]) ==
+            choice_b
         @test_throws ArgumentError suggest_categorical(
             FixedTrial(Dict("s" => "3|$choice_b")), "s", [choice_a, choice_b]
         )
