@@ -62,8 +62,13 @@ end
 
 Check if the given trial wraps an Optuna frozen trial.
 """
-function is_frozen(trial::Trial)
+function is_frozen(trial::Trial{false})
     return pyconvert(Bool, PythonCall.pytype(trial.trial) == optuna.trial.FrozenTrial)
+end
+function is_frozen(trial::Trial{true})
+    thread_safe() do
+        return pyconvert(Bool, PythonCall.pytype(trial.trial) == optuna.trial.FrozenTrial)
+    end
 end
 
 """
@@ -230,10 +235,13 @@ function suggest_categorical(
     end
 end
 
+function _categorical_choice_key(i::Integer, choice)
+    return "$i|$choice"
+end
 function _suggest_categorical(
     trial::Trial, name::String, choices::Union{Vector{T},Tuple{Vararg{T}}}
 ) where {T}
-    choices_str = ["$i|$v" for (i, v) in enumerate(choices)]
+    choices_str = [_categorical_choice_key(i, v) for (i, v) in enumerate(choices)]
     choice = pyconvert(String, trial.trial.suggest_categorical(name, choices_str))
     choice_idx = parse(Int, split(choice, '|')[1])
     return choices[choice_idx]
@@ -244,8 +252,11 @@ function _suggest_fixed_categorical(
     haskey(trial.params, name) ||
         throw(ArgumentError("FixedTrial does not contain parameter `$name`."))
     value = trial.params[name]
-    for choice in choices
+    for (i, choice) in enumerate(choices)
         choice == value && return choice
+        value isa AbstractString &&
+            value == _categorical_choice_key(i, choice) &&
+            return choice
     end
     throw(ArgumentError("FixedTrial parameter `$name` is not one of the provided choices."))
 end

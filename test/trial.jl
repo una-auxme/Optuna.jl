@@ -12,6 +12,11 @@
 
             tell(study, trial, 1.0)
 
+            threaded_trial = ask(study; multithreading=true)
+            @test !is_frozen(threaded_trial)
+
+            tell(study, threaded_trial, 1.0)
+
             frozen_trial = best_trial(study)
             @test is_frozen(frozen_trial)
         end
@@ -44,6 +49,28 @@
         choice_b = FixedTrialTestStruct(3, 4.0)
         fixed_struct = FixedTrial(Dict("s" => choice_b))
         @test suggest_categorical(fixed_struct, "s", [choice_a, choice_b]) == choice_b
+
+        fixed_encoded_struct = FixedTrial(Dict("s" => "2|$choice_b"))
+        @test suggest_categorical(
+            fixed_encoded_struct, "s", [choice_a, choice_b]
+        ) == choice_b
+        @test_throws ArgumentError suggest_categorical(
+            FixedTrial(Dict("s" => "3|$choice_b")), "s", [choice_a, choice_b]
+        )
+
+        create_test_study(; study_name="fixed_trial_encoded_categorical_test") do study, _
+            choices = [choice_a, choice_b]
+            trial = ask(study)
+            selected = suggest_categorical(trial, "s", choices)
+            tell(study, trial, 1.0)
+
+            params = best_params(study)
+            @test params["s"] isa String
+            @test suggest_categorical(FixedTrial(params), "s", choices) == selected
+            @test suggest_categorical(
+                FixedTrial(params; multithreading=true), "s", choices
+            ) == selected
+        end
 
         fixed_multithreaded = FixedTrial(Dict("func" => cos); multithreading=true)
         @test suggest_categorical(fixed_multithreaded, "func", [sin, cos, tan]) == cos
