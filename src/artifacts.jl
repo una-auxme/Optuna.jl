@@ -8,9 +8,9 @@ using JLD2
 """
     FileSystemArtifactStore(
         path::String
-    )
+    ) <: BaseArtifactStore
 
-Data structure for a file system based artifact store.
+Struct for a file system based artifact store.
 For further information see the [FileSystemArtifactStore](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.FileSystemArtifactStore) in the Optuna python documentation.
 
 ## Arguments
@@ -31,7 +31,7 @@ end
 """
     ArtifactMeta
 
-Data structure containing metadata for an artifact.
+Struct containing metadata for an artifact.
 For further information see the [ArtifactMeta](https://optuna.readthedocs.io/en/stable/reference/artifacts.html#optuna.artifacts.ArtifactMeta) in the Optuna python documentation.
 """
 struct ArtifactMeta
@@ -42,8 +42,8 @@ end
 
 """
     upload_artifact(
-        study::Study, 
-        trial::Trial, 
+        study::Study,
+        trial::Trial,
         data::Dict
     )
 
@@ -108,7 +108,7 @@ end
 
 """
     get_all_artifact_meta(
-        study::Study, 
+        study::Study,
         trial
     )
 
@@ -141,8 +141,8 @@ end
 
 """
     download_artifact(
-        study::Study, 
-        artifact_id::String, 
+        study::Study,
+        artifact_id::String,
         file_path::String
     )
 

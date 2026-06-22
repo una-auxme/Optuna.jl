@@ -5,7 +5,7 @@
 """
     RDBStorage(
         url::String
-    )
+    ) <: BaseStorage
 
 Storage class for RDB backends.
 For further information see the [RDBStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.RDBStorage.html) in the Optuna python documentation.
@@ -27,7 +27,7 @@ struct RDBStorage <: BaseStorage
 end
 
 """
-    InMemoryStorage()
+    InMemoryStorage() <: BaseStorage
 
 Storage class that stores data in memory of the running process.
 For further information see the [InMemoryStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.InMemoryStorage.html) in the Optuna python documentation.
@@ -43,7 +43,7 @@ end
 """
     JournalStorage(
         backend::BaseJournalBackend
-    )
+    ) <: BaseStorage
 
 Storage class for Journal storage backend.
 For further information see the [JournalStorage](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.JournalStorage.html) in the Optuna python documentation.
@@ -79,7 +79,7 @@ end
 
 """
     create_sqlite_url(
-        database_path::String, 
+        database_path::String,
         database_name::String
     )
 
