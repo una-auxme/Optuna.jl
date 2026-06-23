@@ -92,6 +92,8 @@ best_values
 
 ```@docs
 Trial
+FixedTrial
+is_frozen
 suggest_int
 suggest_float
 suggest_categorical

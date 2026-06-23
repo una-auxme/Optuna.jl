@@ -50,7 +50,7 @@ export RDBStorage, InMemoryStorage, JournalStorage
 # artifacts.jl
 export FileSystemArtifactStore, ArtifactMeta
 # trial.jl
-export Trial
+export Trial, FixedTrial
 # study.jl
 export Study
 # optimize.jl
@@ -61,7 +61,7 @@ export is_conda_pkg_installed, add_conda_pkg
 # storage.jl
 export get_all_study_names, create_sqlite_url, create_mysql_url, create_redis_url
 # trial.jl
-export suggest_int, suggest_float, suggest_categorical, report, should_prune
+export suggest_int, suggest_float, suggest_categorical, report, should_prune, is_frozen
 # study.jl
 export load_study, delete_study, copy_study
 export ask, tell
