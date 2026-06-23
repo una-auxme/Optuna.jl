@@ -5,9 +5,9 @@
 
 """
     JournalFileSymlinkLock(
-        file_path::String, 
+        file_path::String,
         grace_period::Union{Nothing,Int}=30
-    )
+    ) <: BaseJournalFileLock
 
 Lock class for synchronizing processes for NFSv2 or later.
 For further information see the [JournalFileSymlinkLock](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.journal.JournalFileSymlinkLock.html) in the Optuna python documentation.
@@ -26,9 +26,9 @@ end
 
 """
     JournalFileOpenLock(
-        file_path::String, 
-        grace_period::Union{Nothing,Int}=30}
-    )
+        file_path::String,
+        grace_period::Union{Nothing,Int}=30
+    ) <: BaseJournalFileLock
 
 Lock class for synchronizing processes for NFSv3 or later.
 For further information see the [JournalFileOpenLock](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.journal.JournalFileOpenLock.html) in the Optuna python documentation.
@@ -47,9 +47,9 @@ end
 
 """
     JournalFileBackend(
-        file_path::String; 
+        file_path::String;
         lock_obj::Union{Nothing,BaseJournalFileLock}=nothing
-    )
+    ) <: BaseJournalBackend
 
 File storage class for Journal log backend.
 For further information see the [JournalFileBackend](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.journal.JournalFileBackend.html) in the Optuna python documentation.
@@ -76,10 +76,10 @@ end
 
 """
     JournalRedisBackend(
-        url::String, 
-        use_cluster::Bool=false, 
+        url::String,
+        use_cluster::Bool=false,
         prefix::String=""
-    )
+    ) <: BaseJournalBackend
 
 Redis storage class for Journal log backend.
 For further information see the [JournalRedisBackend](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.storages.journal.JournalRedisBackend.html) in the Optuna python documentation.

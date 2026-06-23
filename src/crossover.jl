@@ -6,9 +6,9 @@
 """
     UniformCrossover(
         swapping_prob::Float64=0.5
-    )
+    ) <: BaseCrossover
 
-Select each parameter with equal probability from the two parent individuals. 
+Select each parameter with equal probability from the two parent individuals.
 For further information see the [UniformCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.UniformCrossover.html) in the Optuna python documentation.
 
 ## Arguments
@@ -26,7 +26,7 @@ end
 """
     BLXAlphaCrossover(
         alpha::Float64=0.5
-    )
+    ) <: BaseCrossover
 
 Uniformly samples child individuals from the hyper-rectangles created by the two parent individuals.
 For further information see the [BLXAlphaCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.BLXAlphaCrossover.html) in the Optuna python documentation.
@@ -46,7 +46,7 @@ end
 """
     SPXCrossover(
         epsilon::Union{Nothing,Float64}=nothing
-    )
+    ) <: BaseCrossover
 
 Uniformly samples child individuals from within a single simplex that is similar to the simplex produced by the parent individual.
 For further information see the [SPXCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.SPXCrossover.html) in the Optuna python documentation.
@@ -68,7 +68,7 @@ end
         eta::Union{Nothing,Float64}=nothing,
         uniform_crossover_prob::Float64=0.5,
         use_child_gene_prob::Float64=0.5,
-    )
+    ) <: BaseCrossover
 
 Uniformly samples child individuals from within a single simplex that is similar to the simplex produced by the parent individual.
 For further information see the [SBXCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.SBXCrossover.html) in the Optuna python documentation.
@@ -98,7 +98,7 @@ end
         eta::Union{Nothing,Float64}=nothing,
         uniform_crossover_prob::Float64=0.5,
         use_child_gene_prob::Float64=0.5,
-    )
+    ) <: BaseCrossover
 
 vSBX generates child individuals without excluding any region of the parameter space, while maintaining the excellent properties of SBX.
 For further information see the [VSBXCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.VSBXCrossover.html) in the Optuna python documentation.
@@ -125,9 +125,9 @@ end
 
 """
     UNDXCrossover(
-        sigma_xi::Float64=0.5, 
+        sigma_xi::Float64=0.5,
         sigma_eta::Union{Nothing,Float64}=nothing
-    )
+    ) <: BaseCrossover
 
 Generates child individuals from the three parents using a multivariate normal distribution.
 For further information see the [UNDXCrossover](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.nsgaii.UNDXCrossover.html) in the Optuna python documentation.
