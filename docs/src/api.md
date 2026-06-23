@@ -26,47 +26,23 @@ JournalFileOpenLock
 ```@docs
 FileSystemArtifactStore
 ArtifactMeta
+upload_artifact
+get_all_artifact_meta
+download_artifact
 ```
 
 ## Sampler
 
 ```@docs
 RandomSampler
-```
-
-```@docs
 TPESampler
-```
-
-```@docs
 GPSampler
-```
-
-```@docs
 CmaEsSampler
-```
-
-```@docs
 NSGAIISampler
-```
-
-```@docs
 NSGAIIISampler
-```
-
-```@docs
 GridSampler
-```
-
-```@docs
 QMCSampler
-```
-
-```@docs
 BruteForceSampler
-```
-
-```@docs
 PartialFixedSampler
 ```
 
@@ -110,9 +86,6 @@ best_params
 best_params_all
 best_value
 best_values
-upload_artifact
-get_all_artifact_meta
-download_artifact
 ```
 
 ## Trial
