@@ -36,8 +36,9 @@
 
             set_user_attr(trial, "artifact_id", artifact_id)
             @test Bool(trial.trial.user_attrs.__contains__("artifact_id"))
-            @test Optuna.PythonCall.pyconvert(String, trial.trial.user_attrs["artifact_id"]) ==
-                artifact_id
+            @test Optuna.PythonCall.pyconvert(
+                String, trial.trial.user_attrs["artifact_id"]
+            ) == artifact_id
 
             tell(study, trial, 1.0)
 
@@ -74,8 +75,12 @@
             tell(study, trial_without_artifacts, 2.0)
 
             trial_with_two = ask(study)
-            artifact_id_2 = upload_artifact(study, trial_with_two, Dict("trial" => 3, "idx" => 1))
-            artifact_id_3 = upload_artifact(study, trial_with_two, Dict("trial" => 3, "idx" => 2))
+            artifact_id_2 = upload_artifact(
+                study, trial_with_two, Dict("trial" => 3, "idx" => 1)
+            )
+            artifact_id_3 = upload_artifact(
+                study, trial_with_two, Dict("trial" => 3, "idx" => 2)
+            )
             tell(study, trial_with_two, 3.0)
 
             @test isempty(get_all_artifact_meta(study, trial_without_artifacts))

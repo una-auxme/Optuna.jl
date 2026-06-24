@@ -99,6 +99,7 @@ suggest_float
 suggest_categorical
 report
 should_prune
+set_user_attr
 ```
 
 ## Optimization
