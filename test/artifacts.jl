@@ -78,6 +78,28 @@
         end
     end
 
+    @testset "metadata lookup dispatch for Julia trials" begin
+        create_test_study(; study_name="artifact_dispatch_test") do study, _
+            trial_false = ask(study; multithreading=false)
+            @test trial_false isa Trial{false}
+            artifact_id_false = upload_artifact(study, trial_false, Dict("trial" => "false"))
+            tell(study, trial_false, 1.0)
+
+            trial_true = ask(study; multithreading=true)
+            @test trial_true isa Trial{true}
+            artifact_id_true = upload_artifact(study, trial_true, Dict("trial" => "true"))
+            tell(study, trial_true, 2.0)
+
+            metas_false = get_all_artifact_meta(study, trial_false)
+            @test length(metas_false) == 1
+            @test metas_false[1].artifact_id == artifact_id_false
+
+            metas_true = get_all_artifact_meta(study, trial_true)
+            @test length(metas_true) == 1
+            @test metas_true[1].artifact_id == artifact_id_true
+        end
+    end
+
     @testset "metadata across trials with uneven artifacts" begin
         create_test_study(; study_name="multi_artifact_test") do study, _
             @test isempty(get_all_artifact_meta(study))

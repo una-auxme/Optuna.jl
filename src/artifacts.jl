@@ -131,8 +131,13 @@ For further information see the [get_all_artifact_meta](https://optuna.readthedo
 ## Returns
 - `Vector{ArtifactMeta}`: List of artifact metadata of the given trial.
 """
-function get_all_artifact_meta(study::Study, trial::Trial)
+function get_all_artifact_meta(study::Study, trial::Trial{false})
     return get_all_artifact_meta(study, trial.trial)
+end
+function get_all_artifact_meta(study::Study, trial::Trial{true})
+    thread_safe() do
+        return get_all_artifact_meta(study, trial.trial)
+    end
 end
 function get_all_artifact_meta(study::Study, trial)
     artifact_metas = optuna.artifacts.get_all_artifact_meta(
