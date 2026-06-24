@@ -27,24 +27,63 @@
 
     @testset "upload and download artifact" begin
         create_test_study(; study_name="artifact_test") do study, test_dir
-            # create a trial and upload artifact
             trial = ask(study)
             data = Dict("model_weights" => [1.0, 2.0, 3.0], "epoch" => 10)
-            upload_artifact(study, trial, data)
+            artifact_id = upload_artifact(study, trial, data)
+            @test artifact_id isa String
+            @test !isempty(artifact_id)
+            @test !Bool(trial.trial.user_attrs.__contains__("artifact_id"))
+
+            set_user_attr(trial, "artifact_id", artifact_id)
+            @test Bool(trial.trial.user_attrs.__contains__("artifact_id"))
+            @test Optuna.PythonCall.pyconvert(String, trial.trial.user_attrs["artifact_id"]) ==
+                artifact_id
+
             tell(study, trial, 1.0)
 
-            # get artifact metadata
             metas = get_all_artifact_meta(study)
             @test length(metas) == 1
             @test metas[1] isa ArtifactMeta
-            @test !isempty(metas[1].artifact_id)
+            @test metas[1].artifact_id == artifact_id
 
-            # download artifact (file_path prefix + artifact_id + .jld2)
-            download_prefix = joinpath(test_dir, "artifact_")
-            download_artifact(study, metas[1].artifact_id, download_prefix)
+            julia_trial_metas = get_all_artifact_meta(study, trial)
+            @test length(julia_trial_metas) == 1
+            @test julia_trial_metas[1].artifact_id == artifact_id
 
-            downloaded_file = abspath(download_prefix) * metas[1].artifact_id * ".jld2"
+            py_trial = first(study.study.trials)
+            py_trial_metas = get_all_artifact_meta(study, py_trial)
+            @test length(py_trial_metas) == 1
+            @test py_trial_metas[1].artifact_id == artifact_id
+
+            downloaded_file = joinpath(test_dir, "downloaded-artifact.jld2")
+            download_artifact(study, artifact_id, downloaded_file)
             @test isfile(downloaded_file)
+            @test !isfile(abspath(downloaded_file) * artifact_id * ".jld2")
+        end
+    end
+
+    @testset "metadata across trials with uneven artifacts" begin
+        create_test_study(; study_name="multi_artifact_test") do study, _
+            @test isempty(get_all_artifact_meta(study))
+
+            trial_with_one = ask(study)
+            artifact_id_1 = upload_artifact(study, trial_with_one, Dict("trial" => 1))
+            tell(study, trial_with_one, 1.0)
+
+            trial_without_artifacts = ask(study)
+            tell(study, trial_without_artifacts, 2.0)
+
+            trial_with_two = ask(study)
+            artifact_id_2 = upload_artifact(study, trial_with_two, Dict("trial" => 3, "idx" => 1))
+            artifact_id_3 = upload_artifact(study, trial_with_two, Dict("trial" => 3, "idx" => 2))
+            tell(study, trial_with_two, 3.0)
+
+            @test isempty(get_all_artifact_meta(study, trial_without_artifacts))
+
+            metas = get_all_artifact_meta(study)
+            artifact_ids = Set(meta.artifact_id for meta in metas)
+            @test length(metas) == 3
+            @test artifact_ids == Set([artifact_id_1, artifact_id_2, artifact_id_3])
         end
     end
 end
