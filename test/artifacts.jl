@@ -25,6 +25,21 @@
         @test meta_with_encoding.encoding == "utf-8"
     end
 
+    @testset "set_user_attr for non-threaded Trial" begin
+        create_test_study(; study_name="set_user_attr_trial_false_test") do study, _
+            trial = ask(study; multithreading=false)
+            @test trial isa Trial{false}
+
+            set_user_attr(trial, "artifact_id", "artifact-123")
+            @test Bool(trial.trial.user_attrs.__contains__("artifact_id"))
+            @test Optuna.PythonCall.pyconvert(
+                String, trial.trial.user_attrs["artifact_id"]
+            ) == "artifact-123"
+
+            tell(study, trial, 1.0)
+        end
+    end
+
     @testset "upload and download artifact" begin
         create_test_study(; study_name="artifact_test") do study, test_dir
             trial = ask(study)
