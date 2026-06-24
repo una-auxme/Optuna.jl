@@ -82,7 +82,9 @@
         create_test_study(; study_name="artifact_dispatch_test") do study, _
             trial_false = ask(study; multithreading=false)
             @test trial_false isa Trial{false}
-            artifact_id_false = upload_artifact(study, trial_false, Dict("trial" => "false"))
+            artifact_id_false = upload_artifact(
+                study, trial_false, Dict("trial" => "false")
+            )
             tell(study, trial_false, 1.0)
 
             trial_true = ask(study; multithreading=true)
