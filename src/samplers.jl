@@ -4,7 +4,7 @@
 #
 
 """
-    RandomSampler(seed=nothing::Union{Nothing,Integer})
+    RandomSampler(seed=nothing::Union{Nothing,Integer}) <: BaseSampler
 
 An independent sampler that samples randomly.
 For further information see the [RandomSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.RandomSampler.html#optuna-samplers-randomsampler) in the Optuna python documentation.
@@ -38,7 +38,7 @@ end
         constant_liar::Bool=false,
         constraints_func::Union{Nothing,Function}=nothing,
         categorical_distance_func::Union{Nothing,Function}=nothing,
-    )
+    ) <: BaseSampler
 
 Sampler using TPE (Tree-structured Parzen Estimator) algorithm.
 For further information see the [TPESampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.TPESampler.html#optuna-samplers-tpesampler) in the Optuna python documentation.
@@ -115,7 +115,7 @@ end
         deterministic_objective::Bool=false,
         constraints_func::Union{Nothing,Function}=nothing,
         warn_independent_sampling::Bool=true,
-    )
+    ) <: BaseSampler
 
 Sampler using Gaussian process-based Bayesian optimization.
 For further information see the [GPSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GPSampler.html#optuna-samplers-gpsampler) in the Optuna python documentation.
@@ -171,7 +171,7 @@ end
         with_margin::Bool=false,
         lr_adapt::Bool=false,
         source_trials::Union{Nothing,Vector{Trial}}=nothing,
-    )
+    ) <: BaseSampler
 
 A sampler using cmaes as the backend.
 For further information see the [CmaEsSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.CmaEsSampler.html#optuna-samplers-cmaessampler) in the Optuna python documentation.
@@ -252,7 +252,7 @@ end
         elite_population_selection_strategy::Union{Nothing,Function}=nothing,
         child_generation_strategy::Union{Nothing,Function}=nothing,
         after_trial_strategy::Union{Nothing,Function}=nothing,
-    )
+    ) <: BaseSampler
 
 Multi-objective sampler using the NSGA-II algorithm.
 For further information see the [NSGAIISampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.NSGAIISampler.html#optuna-samplers-nsgaiisampler) in the Optuna python documentation.
@@ -318,7 +318,7 @@ end
         elite_population_selection_strategy::Union{Nothing,Function}=nothing,
         child_generation_strategy::Union{Nothing,Function}=nothing,
         after_trial_strategy::Union{Nothing,Function}=nothing,
-    ) where {T}
+    ) where {T} <: BaseSampler
 
 Multi-objective sampler using the NSGA-III algorithm.
 For further information see the [NSGAIIISampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.NSGAIIISampler.html#optuna-samplers-nsgaiiisampler) in the Optuna python documentation.
@@ -380,7 +380,7 @@ end
     GridSampler(
         search_space::Dict{String,Vector},
         seed::Union{Nothing,Integer}=nothing
-    )
+    ) <: BaseSampler
 
 Sampler using grid search.
 For further information see the [GridSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.GridSampler.html#optuna-samplers-gridsampler) in the Optuna python documentation.
@@ -408,7 +408,7 @@ end
         independent_sampler::Union{Nothing,BaseSampler}=nothing,
         warn_asynchronous_seeding::Bool=true,
         warn_independent_sampling::Bool=true,
-    )
+    ) <: BaseSampler
 
 A Quasi Monte Carlo Sampler that generates low-discrepancy sequences.
 For further information see the [QMCSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.QMCSampler.html#optuna-samplers-qmcsampler) in the Optuna python documentation.
@@ -453,7 +453,7 @@ end
     BruteForceSampler(
         seed::Union{Nothing,Integer}=nothing,
         avoid_premature_stop::Bool=false
-    )
+    ) <: BaseSampler
 
 Sampler using brute force. This sampler performs exhaustive search on the defined search space.
 For further information see the [BruteForceSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.BruteForceSampler.html#optuna-samplers-bruteforcesampler) in the Optuna python documentation.
@@ -479,7 +479,7 @@ end
 """
     PartialFixedSampler(
         fixed_params::Dict{String,Any},
-        base_sampler::BaseSampler)
+        base_sampler::BaseSampler) <: BaseSampler
 
 Sampler with partially fixed parameters.
 For further information see the [PartialFixedSampler](https://optuna.readthedocs.io/en/stable/reference/samplers/generated/optuna.samplers.PartialFixedSampler.html#optuna-samplers-partialfixedsampler) in the Optuna python documentation.
