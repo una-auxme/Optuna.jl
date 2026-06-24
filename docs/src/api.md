@@ -26,47 +26,23 @@ JournalFileOpenLock
 ```@docs
 FileSystemArtifactStore
 ArtifactMeta
+upload_artifact
+get_all_artifact_meta
+download_artifact
 ```
 
 ## Sampler
 
 ```@docs
 RandomSampler
-```
-
-```@docs
 TPESampler
-```
-
-```@docs
 GPSampler
-```
-
-```@docs
 CmaEsSampler
-```
-
-```@docs
 NSGAIISampler
-```
-
-```@docs
 NSGAIIISampler
-```
-
-```@docs
 GridSampler
-```
-
-```@docs
 QMCSampler
-```
-
-```@docs
 BruteForceSampler
-```
-
-```@docs
 PartialFixedSampler
 ```
 
@@ -101,20 +77,23 @@ Study
 load_study
 delete_study
 copy_study
+directions
 ask
 tell
 best_trial
+best_trials
 best_params
+best_params_all
 best_value
-upload_artifact
-get_all_artifact_meta
-download_artifact
+best_values
 ```
 
 ## Trial
 
 ```@docs
 Trial
+FixedTrial
+is_frozen
 suggest_int
 suggest_float
 suggest_categorical

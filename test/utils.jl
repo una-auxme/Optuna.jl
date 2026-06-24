@@ -11,6 +11,7 @@ function create_test_study(
     sampler=RandomSampler(),
     pruner=MedianPruner(),
     direction="minimize",
+    directions=nothing,
 )
     database_path = joinpath(path, "storage")
     artifact_path = joinpath(path, "artifacts")
@@ -37,6 +38,7 @@ function create_test_study(
         sampler=sampler,
         pruner=pruner,
         direction=direction,
+        directions=directions,
         load_if_exists=true,
     )
 
