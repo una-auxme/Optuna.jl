@@ -8,7 +8,7 @@
         n_startup_trials::Int=5,
         n_warmup_steps::Int=0,
         interval_steps::Int=1;
-        n_min_trials::Int=1)
+        n_min_trials::Int=1) <: BasePruner
 
 Pruner using the median stopping rule. Prune if the trial's best intermediate result is worse than median of intermediate results of previous trials at the same step.
 For further information see the [MedianPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.MedianPruner.html) in the Optuna python documentation.
@@ -36,7 +36,7 @@ struct MedianPruner <: BasePruner
 end
 
 """
-    NopPruner()
+    NopPruner() <: BasePruner
 
 Pruner which never prunes trials.
 For further information see the [NopPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.NopPruner.html) in the Optuna python documentation.
@@ -55,7 +55,7 @@ end
     PatientPruner(
         wrapped_pruner::Union{BasePruner,Nothing},
         patience::Int;
-        min_delta::Float64=0.0)
+        min_delta::Float64=0.0) <: BasePruner
 
 Pruner which wraps another pruner with tolerance. This pruner monitors intermediate values in a trial and prunes the trial if the improvement in the intermediate values after a patience period is less than a threshold.
 For further information see the [PatientPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.PatientPruner.html) in the Optuna python documentation.
@@ -83,7 +83,7 @@ end
         n_startup_trials::Int=5,
         n_warmup_steps::Int=0,
         interval_steps::Int=1;
-        n_min_trials::Int=1)
+        n_min_trials::Int=1) <: BasePruner
 
 Pruner to keep the specified percentile of the trials. Prune if the best intermediate value is in the bottom percentile among trials at the same step.
 For further information see the [PercentilePruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.PercentilePruner.html) in the Optuna python documentation.
@@ -121,7 +121,7 @@ end
         min_resource::Union{String,Int}="auto",
         reduction_factor::Int=4,
         min_early_stopping_rate::Int=0,
-        bootstrap_count::Int=0)
+        bootstrap_count::Int=0) <: BasePruner
 
 Pruner using Asynchronous Successive Halving Algorithm.
 For further information see the [SuccessiveHalvingPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.SuccessiveHalvingPruner.html) in the Optuna python documentation.
@@ -156,7 +156,7 @@ end
         min_resource::Int=1,
         max_resource::Union{String,Int}="auto",
         reduction_factor::Int=3,
-        bootstrap_count::Int=0)
+        bootstrap_count::Int=0) <: BasePruner
 
 Pruner using Hyperband.
 For further information see the [HyperbandPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.HyperbandPruner.html) in the Optuna python documentation.
@@ -191,7 +191,7 @@ end
         lower::Union{Float64,Nothing}=nothing,
         upper::Union{Float64,Nothing}=nothing,
         n_warmup_steps::Int=0,
-        interval_steps::Int=1)
+        interval_steps::Int=1) <: BasePruner
 
 Pruner to detect outlying metrics of the trials. Prune if a metric exceeds upper threshold, falls behind lower threshold or reaches NaN.
 For further information see the [ThresholdPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.ThresholdPruner.html) in the Optuna python documentation.
@@ -224,7 +224,7 @@ end
 """
     WilcoxonPruner(;
         p_threshold::Float64=0.1,
-        n_startup_steps::Int=2)
+        n_startup_steps::Int=2) <: BasePruner
 
 Pruner based on the Wilcoxon signed-rank test. This pruner performs the Wilcoxon signed-rank test between the current trial and the current best trial, and stops whenever the pruner is sure up to a given p-value that the current trial is worse than the best one.
 For further information see the [WilcoxonPruner](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.pruners.WilcoxonPruner.html) in the Optuna python documentation.

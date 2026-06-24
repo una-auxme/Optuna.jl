@@ -21,9 +21,22 @@
             @test study isa Study
         end
 
+        # multi-objective with directions
+        create_test_study(;
+            study_name="multi_obj_test", directions=["minimize", "maximize"]
+        ) do study, _
+            @test study isa Study
+            @test directions(study) == ["minimize", "maximize"]
+        end
+
         # invalid direction should error
         @test_throws ErrorException create_test_study(
             (_, _) -> nothing; study_name="invalid_test", direction="invalid"
+        )
+        @test_throws ErrorException create_test_study(
+            (_, _) -> nothing;
+            study_name="invalid_test2",
+            directions=["minimize", "invalid"],
         )
     end
 
@@ -34,6 +47,17 @@
 
             x = suggest_float(trial, "x", 0.0, 10.0)
             tell(study, trial, x)
+        end
+        create_test_study(;
+            study_name="multi_obj_ask_tell_test", directions=["minimize", "maximize"]
+        ) do study, _
+            trial = ask(study)
+
+            x = suggest_float(trial, "x", 0.0, 10.0)
+            tell(study, trial, [x, 10.0 - x])
+
+            trial = ask(study)
+            @test_throws ArgumentError tell(study, trial, [1.0, 2.0, 3.0])
         end
     end
 
@@ -50,6 +74,23 @@
             @test best_value(study) isa Float64
             @test best_params(study) isa Dict{String,Any}
             @test best_trial(study) isa Trial
+        end
+
+        create_test_study(;
+            study_name="best_multi_test", directions=["minimize", "maximize"]
+        ) do study, _
+            # run a few multi-objective trials
+            for vals in [[5.0, 1.0], [3.0, 2.0], [7.0, 0.5]]
+                trial = ask(study)
+                suggest_float(trial, "x", 0.0, 10.0)
+                tell(study, trial, vals)
+            end
+
+            best_vals = best_values(study)
+            @test length(best_vals) == 1
+            @test best_vals[1] == [3.0, 2.0]
+            @test best_params_all(study) isa Vector{Dict{String,Any}}
+            @test best_trials(study) isa Vector
         end
     end
 
