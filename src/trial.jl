@@ -309,3 +309,27 @@ function should_prune(trial::Union{Trial{true},FixedTrial{true}})
         return Bool(trial.trial.should_prune())
     end
 end
+
+"""
+    set_user_attr(
+        trial::Trial,
+        key::String,
+        value,
+    )
+
+Set a user attribute on the given trial.
+For further information see the [set_user_attr](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#optuna.trial.Trial.set_user_attr) in the Optuna python documentation.
+
+## Arguments
+- `trial::Trial`: The trial to set the user attribute on. (see [Trial](@ref))
+- `key::String`: The user attribute key.
+- `value`: The user attribute value.
+"""
+function set_user_attr(trial::Trial{false}, key::String, value)
+    return trial.trial.set_user_attr(key, value)
+end
+function set_user_attr(trial::Trial{true}, key::String, value)
+    thread_safe() do
+        return trial.trial.set_user_attr(key, value)
+    end
+end

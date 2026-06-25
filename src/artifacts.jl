@@ -54,35 +54,42 @@ For further information see the [upload_artifact](https://optuna.readthedocs.io/
 - `study::Study`: The study to upload the artifact to. (see [Study](@ref))
 - `trial::Trial`: The trial to associate the artifact with. (see [Trial](@ref))
 - `data::Dict`: The data to be stored as an artifact.
+
+## Returns
+- `String`: The uploaded artifact ID.
 """
 function upload_artifact(study::Study, trial::Trial{false}, data::Dict)
     artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
 
     JLD2.save(artifact_file, data)
-    artifact_id = optuna.artifacts.upload_artifact(;
-        artifact_store=study.artifact_store.artifact_store,
-        file_path=artifact_file,
-        study_or_trial=trial.trial,
-        storage=study.storage.storage,
-    )
-    trial.trial.set_user_attr("artifact_id", artifact_id)
-
-    return rm(artifact_file)
-end
-function upload_artifact(study::Study, trial::Trial{true}, data::Dict)
-    artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
-
-    thread_safe() do
-        JLD2.save(artifact_file, data)
+    try
         artifact_id = optuna.artifacts.upload_artifact(;
             artifact_store=study.artifact_store.artifact_store,
             file_path=artifact_file,
             study_or_trial=trial.trial,
             storage=study.storage.storage,
         )
-        trial.trial.set_user_attr("artifact_id", artifact_id)
+        return pyconvert(String, artifact_id)
+    finally
+        rm(artifact_file; force=true)
+    end
+end
+function upload_artifact(study::Study, trial::Trial{true}, data::Dict)
+    artifact_file = joinpath(study.artifact_store.path, "artifact.jld2")
 
-        return rm(artifact_file)
+    thread_safe() do
+        JLD2.save(artifact_file, data)
+        try
+            artifact_id = optuna.artifacts.upload_artifact(;
+                artifact_store=study.artifact_store.artifact_store,
+                file_path=artifact_file,
+                study_or_trial=trial.trial,
+                storage=study.storage.storage,
+            )
+            return pyconvert(String, artifact_id)
+        finally
+            rm(artifact_file; force=true)
+        end
     end
 end
 
@@ -101,9 +108,11 @@ For further information see the [get_all_artifact_meta](https://optuna.readthedo
 - `Vector{ArtifactMeta}`: List of artifact metadata of all artifacts in the study.
 """
 function get_all_artifact_meta(study::Study)
-    return stack([get_all_artifact_meta(study, trial) for trial in study.study.trials])[
-        1, :,
-    ]
+    artifact_metas = ArtifactMeta[]
+    for trial in study.study.trials
+        append!(artifact_metas, get_all_artifact_meta(study, trial))
+    end
+    return artifact_metas
 end
 
 """
@@ -117,11 +126,19 @@ For further information see the [get_all_artifact_meta](https://optuna.readthedo
 
 ## Arguments
 - `study::Study`: The study to get the artifact metadata from. (see [Study](@ref))
-- `trial`: The trial to get the artifact metadata from. (see [Trial](@ref))
+- `trial`: The Julia `Trial` or Python Optuna trial to get the artifact metadata from.
 
 ## Returns
 - `Vector{ArtifactMeta}`: List of artifact metadata of the given trial.
 """
+function get_all_artifact_meta(study::Study, trial::Trial{false})
+    return get_all_artifact_meta(study, trial.trial)
+end
+function get_all_artifact_meta(study::Study, trial::Trial{true})
+    thread_safe() do
+        return get_all_artifact_meta(study, trial.trial)
+    end
+end
 function get_all_artifact_meta(study::Study, trial)
     artifact_metas = optuna.artifacts.get_all_artifact_meta(
         trial; storage=study.storage.storage
@@ -152,12 +169,12 @@ For further information see the [download_artifact](https://optuna.readthedocs.i
 ## Arguments
 - `study::Study`: The study to download the artifact from. (see [Study](@ref))
 - `artifact_id::String`: The ID of the artifact to download.
-- `file_path::String`: The path where the downloaded artifact should be stored.
+- `file_path::String`: The exact file path where the downloaded artifact should be stored.
 """
 function download_artifact(study::Study, artifact_id::String, file_path::String)
     return optuna.artifacts.download_artifact(;
         artifact_store=study.artifact_store.artifact_store,
         artifact_id=artifact_id,
-        file_path=abspath(file_path) * "$artifact_id.jld2",
+        file_path=abspath(file_path),
     )
 end

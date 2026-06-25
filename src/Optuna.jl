@@ -67,6 +67,7 @@ export load_study, delete_study, copy_study
 export ask, tell
 export best_trial, best_params, best_value
 export directions, best_trials, best_values, best_params_all
+export set_user_attr
 export upload_artifact, get_all_artifact_meta, download_artifact
 # optimize.jl
 export optimize
