@@ -14,7 +14,13 @@ makedocs(;
     modules=[Optuna],
     checkdocs=:exports,
     linkcheck=false,
-    pages=["Home" => "index.md", "API Reference" => "api.md"],
+    pages=[
+        "Home" => "index.md",
+        "Overview" => "overview.md",
+        "Getting Started" => ["First optimization" => "FirstHyperOpt.md"],
+        "Examples" => ["Polynomial fitting" => "FittingPolynomial.md"],
+        "API Reference" => "api.md",
+    ],
 )
 
 deploydocs(; repo="github.com/una-auxme/Optuna.jl.git", devbranch="main")
