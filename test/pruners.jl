@@ -7,33 +7,34 @@
 Test that a pruner can be used with a study and should_prune returns a Bool.
 """
 function test_pruner_basic(pruner::Optuna.BasePruner)
-    study, _ = create_test_study(; pruner=pruner)
-    trial = ask(study)
-    report(trial, 1.0, 0)
-    @test should_prune(trial) isa Bool
-    tell(study, trial, 1.0)
-    return nothing
+    create_test_study(; pruner=pruner) do study, _
+        trial = ask(study)
+        report(trial, 1.0, 0)
+        @test should_prune(trial) isa Bool
+        tell(study, trial, 1.0)
+        return nothing
+    end
 end
 
 """
 Test that a pruner prunes trials with bad values after establishing a baseline.
 """
 function test_pruner_prunes(pruner::Optuna.BasePruner)
-    study, _ = create_test_study(; pruner=pruner)
+    create_test_study(; pruner=pruner) do study, _
+        # complete trials to establish baseline
+        for value in [1.0, 2.0, 3.0]
+            trial = ask(study)
+            report(trial, value, 0)
+            tell(study, trial, value)
+        end
 
-    # complete trials to establish baseline
-    for value in [1.0, 2.0, 3.0]
+        # new trial with bad value should be pruned
         trial = ask(study)
-        report(trial, value, 0)
-        tell(study, trial, value)
+        report(trial, 100.0, 0)
+        @test should_prune(trial) == true
+        tell(study, trial, 100.0)
+        return nothing
     end
-
-    # new trial with bad value should be pruned
-    trial = ask(study)
-    report(trial, 100.0, 0)
-    @test should_prune(trial) == true
-    tell(study, trial, 100.0)
-    return nothing
 end
 
 @testset "pruners" begin
@@ -50,16 +51,17 @@ end
         test_pruner_basic(pruner)
 
         # NopPruner should never prune, even with bad value
-        study, _ = create_test_study(; pruner=pruner)
-        for value in [1.0, 2.0, 3.0]
+        create_test_study(; pruner=pruner) do study, _
+            for value in [1.0, 2.0, 3.0]
+                trial = ask(study)
+                report(trial, value, 0)
+                tell(study, trial, value)
+            end
             trial = ask(study)
-            report(trial, value, 0)
-            tell(study, trial, value)
+            report(trial, 100.0, 0)
+            @test should_prune(trial) == false
+            tell(study, trial, 100.0)
         end
-        trial = ask(study)
-        report(trial, 100.0, 0)
-        @test should_prune(trial) == false
-        tell(study, trial, 100.0)
     end
 
     @testset "PatientPruner" begin
@@ -84,18 +86,19 @@ end
         test_pruner_basic(pruner)
 
         # test pruning with multiple steps (ASHA uses rungs)
-        study, _ = create_test_study(; pruner=pruner)
-        for i in 1:5
-            trial = ask(study)
-            for step in 0:3
-                report(trial, Float64(i), step)
+        create_test_study(; pruner=pruner) do study, _
+            for i in 1:5
+                trial = ask(study)
+                for step in 0:3
+                    report(trial, Float64(i), step)
+                end
+                tell(study, trial, Float64(i))
             end
-            tell(study, trial, Float64(i))
+            trial = ask(study)
+            report(trial, 100.0, 0)
+            @test should_prune(trial) isa Bool
+            tell(study, trial, 100.0)
         end
-        trial = ask(study)
-        report(trial, 100.0, 0)
-        @test should_prune(trial) isa Bool
-        tell(study, trial, 100.0)
     end
 
     @testset "HyperbandPruner" begin
@@ -104,18 +107,19 @@ end
         test_pruner_basic(pruner)
 
         # test pruning with multiple steps
-        study, _ = create_test_study(; pruner=pruner)
-        for i in 1:5
-            trial = ask(study)
-            for step in 0:3
-                report(trial, Float64(i), step)
+        create_test_study(; pruner=pruner) do study, _
+            for i in 1:5
+                trial = ask(study)
+                for step in 0:3
+                    report(trial, Float64(i), step)
+                end
+                tell(study, trial, Float64(i))
             end
-            tell(study, trial, Float64(i))
+            trial = ask(study)
+            report(trial, 100.0, 0)
+            @test should_prune(trial) isa Bool
+            tell(study, trial, 100.0)
         end
-        trial = ask(study)
-        report(trial, 100.0, 0)
-        @test should_prune(trial) isa Bool
-        tell(study, trial, 100.0)
     end
 
     @testset "ThresholdPruner" begin
@@ -123,19 +127,19 @@ end
         @test pruner isa ThresholdPruner
         test_pruner_basic(pruner)
 
-        study, _ = create_test_study(; pruner=pruner)
+        create_test_study(; pruner=pruner) do study, _
+            # value within threshold - should not prune
+            trial = ask(study)
+            report(trial, 5.0, 0)
+            @test should_prune(trial) == false
+            tell(study, trial, 5.0)
 
-        # value within threshold - should not prune
-        trial = ask(study)
-        report(trial, 5.0, 0)
-        @test should_prune(trial) == false
-        tell(study, trial, 5.0)
-
-        # value above upper threshold - should prune
-        trial = ask(study)
-        report(trial, 100.0, 0)
-        @test should_prune(trial) == true
-        tell(study, trial, 100.0)
+            # value above upper threshold - should prune
+            trial = ask(study)
+            report(trial, 100.0, 0)
+            @test should_prune(trial) == true
+            tell(study, trial, 100.0)
+        end
     end
 
     @testset "WilcoxonPruner" begin
@@ -144,19 +148,20 @@ end
         test_pruner_basic(pruner)
 
         # Wilcoxon needs multiple steps to compare
-        study, _ = create_test_study(; pruner=pruner)
-        for i in 1:3
+        create_test_study(; pruner=pruner) do study, _
+            for i in 1:3
+                trial = ask(study)
+                for step in 0:5
+                    report(trial, Float64(i), step)
+                end
+                tell(study, trial, Float64(i))
+            end
             trial = ask(study)
             for step in 0:5
-                report(trial, Float64(i), step)
+                report(trial, 100.0, step)
             end
-            tell(study, trial, Float64(i))
+            @test should_prune(trial) isa Bool
+            tell(study, trial, 100.0)
         end
-        trial = ask(study)
-        for step in 0:5
-            report(trial, 100.0, step)
-        end
-        @test should_prune(trial) isa Bool
-        tell(study, trial, 100.0)
     end
 end

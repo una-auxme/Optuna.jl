@@ -5,7 +5,7 @@
 
 """
     is_conda_pkg_installed(
-        pkg_name::String; 
+        pkg_name::String;
         version::Union{Nothing,String}=nothing
     )
 
@@ -32,7 +32,7 @@ end
 
 """
     add_conda_pkg(
-        pkg_name::String; 
+        pkg_name::String;
         version::Union{Nothing,String}=nothing
     )
 

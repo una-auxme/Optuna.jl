@@ -4,80 +4,163 @@
 #
 
 @testset "trial" begin
-    @testset "suggest_int" begin
-        study, test_dir = create_test_study(; study_name="suggest_int_test")
-        trial = ask(study)
+    @testset "trial types" begin
+        create_test_study(; study_name="trial_type_test") do study, _
+            trial = ask(study)
 
-        x = suggest_int(trial, "x", typemin(Int), typemax(Int))
-        @test x isa Int
+            @test !is_frozen(trial)
 
-        y = suggest_int(trial, "y", -100, 100)
-        @test y isa Int
-        @test -100 <= y <= 100
+            tell(study, trial, 1.0)
 
-        # same name returns same value
-        x2 = suggest_int(trial, "x", typemin(Int), typemax(Int))
-        @test x == x2
+            threaded_trial = ask(study; multithreading=true)
+            @test !is_frozen(threaded_trial)
 
-        z1 = suggest_int(trial, "z1", -100, 100; step=10)
-        @test z1 isa Int
-        @test z1 % 10 == 0
+            tell(study, threaded_trial, 1.0)
 
-        z2 = suggest_int(trial, "z2", 1, 100; log=true)
-        @test z2 isa Int
-        @test 1 <= z2 <= 100
+            frozen_trial = best_trial(study)
+            @test is_frozen(frozen_trial)
+        end
+    end
 
-        # low < 1 throws an error
-        @test_throws Optuna.PythonCall.PyException suggest_int(
-            trial, "err1", -100, 100; log=true
+    @testset "FixedTrial" begin
+        struct FixedTrialTestStruct
+            a::Int
+            b::AbstractFloat
+        end
+
+        fixed_int = FixedTrial(Dict("x" => 1); number=7)
+        @test fixed_int isa FixedTrial
+        @test suggest_int(fixed_int, "x", 0, 10) == 1
+        @test Optuna.PythonCall.pyconvert(Int, fixed_int.trial.number) == 7
+
+        fixed_float = FixedTrial(Dict("x" => 1.5))
+        @test suggest_float(fixed_float, "x", 0.0, 2.0) == 1.5
+
+        fixed_categorical = FixedTrial(Dict("y" => "b"))
+        @test suggest_categorical(fixed_categorical, "y", ["a", "b"]) == "b"
+
+        fixed_categorical_multithreaded = FixedTrial(Dict("y" => "b"); multithreading=true)
+        @test suggest_categorical(fixed_categorical_multithreaded, "y", ["a", "b"]) == "b"
+
+        fixed_func = FixedTrial(Dict("func" => sin))
+        @test suggest_categorical(fixed_func, "func", [sin, cos, tan]) == sin
+
+        choice_a = FixedTrialTestStruct(1, 2.0f0)
+        choice_b = FixedTrialTestStruct(3, 4.0)
+        fixed_struct = FixedTrial(Dict("s" => choice_b))
+        @test suggest_categorical(fixed_struct, "s", [choice_a, choice_b]) == choice_b
+
+        fixed_encoded_struct = FixedTrial(Dict("s" => "2|$choice_b"))
+        @test suggest_categorical(fixed_encoded_struct, "s", [choice_a, choice_b]) ==
+            choice_b
+        @test_throws ArgumentError suggest_categorical(
+            FixedTrial(Dict("s" => "3|$choice_b")), "s", [choice_a, choice_b]
         )
-        # step and log cannot be used at the same time
-        @test_throws AssertionError suggest_int(trial, "err2", 10, 100; step=10, log=true)
 
-        tell(study, trial, 1.0)
+        create_test_study(; study_name="fixed_trial_encoded_categorical_test") do study, _
+            choices = [choice_a, choice_b]
+            trial = ask(study)
+            selected = suggest_categorical(trial, "s", choices)
+            tell(study, trial, 1.0)
+
+            params = best_params(study)
+            @test params["s"] isa String
+            @test suggest_categorical(FixedTrial(params), "s", choices) == selected
+            @test suggest_categorical(
+                FixedTrial(params; multithreading=true), "s", choices
+            ) == selected
+        end
+
+        fixed_multithreaded = FixedTrial(Dict("func" => cos); multithreading=true)
+        @test suggest_categorical(fixed_multithreaded, "func", [sin, cos, tan]) == cos
+
+        @test_throws ArgumentError suggest_categorical(
+            FixedTrial(Dict("func" => sqrt)), "func", [sin, cos, tan]
+        )
+        @test_throws ArgumentError suggest_categorical(
+            FixedTrial(Dict{String,Any}()), "missing", [sin, cos, tan]
+        )
+
+        report(fixed_int, 1.0, 0)
+        @test !should_prune(fixed_int)
+    end
+
+    @testset "suggest_int" begin
+        create_test_study(; study_name="suggest_int_test") do study, _
+            trial = ask(study)
+
+            x = suggest_int(trial, "x", typemin(Int), typemax(Int))
+            @test x isa Int
+
+            y = suggest_int(trial, "y", -100, 100)
+            @test y isa Int
+            @test -100 <= y <= 100
+
+            # same name returns same value
+            x2 = suggest_int(trial, "x", typemin(Int), typemax(Int))
+            @test x == x2
+
+            z1 = suggest_int(trial, "z1", -100, 100; step=10)
+            @test z1 isa Int
+            @test z1 % 10 == 0
+
+            z2 = suggest_int(trial, "z2", 1, 100; log=true)
+            @test z2 isa Int
+            @test 1 <= z2 <= 100
+
+            # low < 1 throws an error
+            @test_throws Optuna.PythonCall.PyException suggest_int(
+                trial, "err1", -100, 100; log=true
+            )
+            # step and log cannot be used at the same time
+            @test_throws AssertionError suggest_int(
+                trial, "err2", 10, 100; step=10, log=true
+            )
+
+            tell(study, trial, 1.0)
+        end
     end
 
     @testset "suggest_float" begin
-        study, test_dir = create_test_study(; study_name="suggest_float_test")
-        trial = ask(study)
+        create_test_study(; study_name="suggest_float_test") do study, _
+            trial = ask(study)
 
-        y = suggest_float(trial, "y", 1e-100, 1e100)
-        @test y isa Float64
+            y = suggest_float(trial, "y", 1e-100, 1e100)
+            @test y isa Float64
 
-        x = suggest_float(trial, "x", -10.0, 10.0)
-        @test x isa Float64
-        @test -10.0 <= x <= 10.0
+            x = suggest_float(trial, "x", -10.0, 10.0)
+            @test x isa Float64
+            @test -10.0 <= x <= 10.0
 
-        @test_logs (:warn, r"Converting") x = suggest_float(trial, "x", -10.0f0, 10.0f0)
-        x = @test x isa Float64
+            @test_logs (:warn, r"Converting") x = suggest_float(trial, "x", -10.0f0, 10.0f0)
+            x = @test x isa Float64
 
-        # same name returns same value
-        y2 = suggest_float(trial, "y", 1e-100, 1e100)
-        @test y == y2
+            # same name returns same value
+            y2 = suggest_float(trial, "y", 1e-100, 1e100)
+            @test y == y2
 
-        z1 = suggest_float(trial, "z1", -100.0, 100.0; step=10.0)
-        @test z1 isa Float64
-        @test z1 % 10.0 == 0.0
+            z1 = suggest_float(trial, "z1", -100.0, 100.0; step=10.0)
+            @test z1 isa Float64
+            @test z1 % 10.0 == 0.0
 
-        z2 = suggest_float(trial, "z2", 1.0, 1e100; log=true)
-        @test z2 isa Float64
-        @test 1.0 <= z2 <= 1e100
+            z2 = suggest_float(trial, "z2", 1.0, 1e100; log=true)
+            @test z2 isa Float64
+            @test 1.0 <= z2 <= 1e100
 
-        # low <= 0 throws an error
-        @test_throws Optuna.PythonCall.PyException suggest_float(
-            trial, "err1", 0.0, 1e100; log=true
-        )
-        # step and log cannot be used at the same time
-        @test_throws AssertionError suggest_float(
-            trial, "err2", 1.0, 1e100; step=10.0, log=true
-        )
+            # low <= 0 throws an error
+            @test_throws Optuna.PythonCall.PyException suggest_float(
+                trial, "err1", 0.0, 1e100; log=true
+            )
+            # step and log cannot be used at the same time
+            @test_throws AssertionError suggest_float(
+                trial, "err2", 1.0, 1e100; step=10.0, log=true
+            )
 
-        tell(study, trial, 1.0)
+            tell(study, trial, 1.0)
+        end
     end
 
     @testset "suggest_categorical" begin
-        study, test_dir = create_test_study(; study_name="suggest_cat_test")
-
         # used for testing struct types as choices for suggest_categorical
         struct TestStruct
             a::Int
@@ -85,7 +168,6 @@
         end
 
         function suggest_categorical_tests(trial::Trial)
-
             # string choices
             z = suggest_categorical(trial, "z", ["a", "b", "c"])
             @test z isa String
@@ -123,30 +205,31 @@
             return nothing
         end
 
-        # single_threading
-        trial = ask(study; multithreading=false)
-        suggest_categorical_tests(trial)
-        tell(study, trial, 1.0)
+        create_test_study(; study_name="suggest_cat_test") do study, _
+            # single_threading
+            trial = ask(study; multithreading=false)
+            suggest_categorical_tests(trial)
+            tell(study, trial, 1.0)
 
-        # multi_threading
-        trial = ask(study; multithreading=true)
-        suggest_categorical_tests(trial)
-        tell(study, trial, 1.0)
+            # multi_threading
+            trial = ask(study; multithreading=true)
+            suggest_categorical_tests(trial)
+            tell(study, trial, 1.0)
+        end
     end
 
     @testset "report and should_prune" begin
-        study, test_dir = create_test_study(;
-            study_name="report_test", pruner=MedianPruner()
-        )
-        trial = ask(study)
+        create_test_study(; study_name="report_test", pruner=MedianPruner()) do study, _
+            trial = ask(study)
 
-        # report intermediate values
-        report(trial, 1.0, 0)
-        report(trial, 2.0, 1)
+            # report intermediate values
+            report(trial, 1.0, 0)
+            report(trial, 2.0, 1)
 
-        # should_prune returns Bool
-        @test should_prune(trial) isa Bool
+            # should_prune returns Bool
+            @test should_prune(trial) isa Bool
 
-        tell(study, trial, 1.0)
+            tell(study, trial, 1.0)
+        end
     end
 end

@@ -4,27 +4,27 @@
 #
 
 function test_sampler(sampler::Optuna.BaseSampler; finite_search_space::Bool=false)
-    study, test_dir = create_test_study(; sampler=sampler)
+    create_test_study(; sampler=sampler) do study, _
+        # run a few trials and verify parameter suggestions work
+        for _ in 1:10
+            trial = ask(study)
 
-    # run a few trials and verify parameter suggestions work
-    for _ in 1:10
-        trial = ask(study)
+            x = 1.0
+            if !finite_search_space
+                x = suggest_float(trial, "x", 0.0, 10.0)
+            end
 
-        x = 1.0
-        if !finite_search_space
-            x = suggest_float(trial, "x", 0.0, 10.0)
+            y = suggest_int(trial, "y", 1, 100)
+            z = suggest_categorical(trial, "z", ["a", "b", "c"])
+
+            @test 0.0 <= x <= 10.0
+            @test 1 <= y <= 100
+            @test z in ["a", "b", "c"]
+
+            tell(study, trial, x + y)
         end
-
-        y = suggest_int(trial, "y", 1, 100)
-        z = suggest_categorical(trial, "z", ["a", "b", "c"])
-
-        @test 0.0 <= x <= 10.0
-        @test 1 <= y <= 100
-        @test z in ["a", "b", "c"]
-
-        tell(study, trial, x + y)
+        return nothing
     end
-    return nothing
 end
 
 function test_sampler_reproducibility(sampler_constructor)
@@ -36,11 +36,12 @@ function test_sampler_reproducibility(sampler_constructor)
     for (results, run) in [(results1, 1), (results2, 2)]
         sampler = sampler_constructor(seed)
 
-        study, test_dir = create_test_study(; sampler=sampler, study_name="repro_test_$run")
-        for _ in 1:3
-            trial = ask(study)
-            push!(results, suggest_int(trial, "y", 1, 100))
-            tell(study, trial, 1.0)
+        create_test_study(; sampler=sampler, study_name="repro_test_$run") do study, _
+            for _ in 1:3
+                trial = ask(study)
+                push!(results, suggest_int(trial, "y", 1, 100))
+                tell(study, trial, 1.0)
+            end
         end
     end
 

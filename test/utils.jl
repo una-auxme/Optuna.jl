@@ -3,13 +3,15 @@
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
 
-function create_test_study(;
+function create_test_study(
+    internal::Function;
     path=mktempdir(),
     database_name="test_db",
     study_name="test-study",
     sampler=RandomSampler(),
     pruner=MedianPruner(),
     direction="minimize",
+    directions=nothing,
 )
     database_path = joinpath(path, "storage")
     artifact_path = joinpath(path, "artifacts")
@@ -36,9 +38,18 @@ function create_test_study(;
         sampler=sampler,
         pruner=pruner,
         direction=direction,
+        directions=directions,
         load_if_exists=true,
     )
-    return study, path
+
+    try
+        internal(study, path)
+    finally
+        Sys.iswindows() && study.study._storage._backend.engine.dispose()
+        rm(path; recursive=true)
+    end
+
+    return nothing
 end
 
 @testset "utils" begin
