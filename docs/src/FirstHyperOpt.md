@@ -98,23 +98,8 @@ println("Best value: ", best_value(study))
 
 The result should move toward `x = 2`, `y = -1`, and `use_offset = false`, because that combination minimizes the objective.
 
-## Passing a search space separately
+## Where to define the search space
 
-You can also pass a search space to `optimize`. In that mode, Optuna.jl suggests the parameters before calling the objective and passes them either as keyword arguments or as a `NamedTuple`.
+Define the search space inside the objective with `suggest_int`, `suggest_float`, and `suggest_categorical`. This keeps the sampled values close to the code that uses them and also supports conditional spaces, where later suggestions depend on earlier choices.
 
-```julia
-search_space = (
-    x=(-10.0, 10.0),
-    y=(-5, 5),
-    use_offset=[true, false],
-)
-
-function objective(trial::Trial; x, y, use_offset)
-    offset = use_offset ? 2.0 : 0.0
-    return (x - 2.0)^2 + (y + 1)^2 + offset
-end
-
-optimize(study, objective, search_space; n_trials=30)
-```
-
-Suggesting inside the objective is more flexible for conditional search spaces. Passing a search space separately is compact when every trial uses the same parameters.
+For larger objectives, move the actual workload into helper functions and keep the Optuna-specific suggestion calls near the top of the objective.

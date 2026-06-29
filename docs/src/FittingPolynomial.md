@@ -101,7 +101,7 @@ function objective(trial::Trial)
         end
     end
 
-    upload_artifact(
+    artifact_id = upload_artifact(
         study,
         trial,
         Dict(
@@ -114,6 +114,7 @@ function objective(trial::Trial)
             "final_loss" => Float64(loss),
         ),
     )
+    set_user_attr(trial, "artifact_id", artifact_id)
 
     return Float64(loss)
 end
@@ -141,9 +142,10 @@ using PythonCall
 trial = best_trial(study)
 user_attrs = pyconvert(Dict{String,Any}, trial.trial.user_attrs)
 artifact_id = user_attrs["artifact_id"]
+artifact_file = "best_model_$(artifact_id).jld2"
 
-download_artifact(study, artifact_id, "best_model_")
-best_data = JLD2.load("best_model_$(artifact_id).jld2")
+download_artifact(study, artifact_id, artifact_file)
+best_data = JLD2.load(artifact_file)
 ```
 
 The artifact contains the trained parameters, model state, and hyperparameters that were saved in the objective.

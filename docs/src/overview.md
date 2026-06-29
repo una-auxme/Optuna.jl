@@ -30,8 +30,6 @@ function objective(trial::Trial)
 end
 ```
 
-This works well when later parameters depend on earlier ones. For simple fixed search spaces, `optimize` can receive a `NamedTuple` and pass the sampled values into the objective.
-
 ## Samplers
 
 Samplers choose the next parameter values. Useful starting points are:
