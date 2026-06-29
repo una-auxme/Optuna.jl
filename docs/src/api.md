@@ -15,8 +15,12 @@ load_study
 delete_study
 copy_study
 best_trial
+best_trials
 best_params
+best_params_all
 best_value
+best_values
+directions
 ```
 
 ## Trial search spaces
@@ -25,11 +29,14 @@ Trial suggestion functions define the parameter search space. Put them inside th
 
 ```@docs
 Trial
+FixedTrial
 suggest_int
 suggest_float
 suggest_categorical
 report
 should_prune
+is_frozen
+set_user_attr
 ```
 
 ## Storage
