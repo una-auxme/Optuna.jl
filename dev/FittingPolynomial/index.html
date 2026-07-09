@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Polynomial fitting · Optuna.jl</title><meta name="title" content="Polynomial fitting · Optuna.jl"/><meta property="og:title" content="Polynomial fitting · Optuna.jl"/><meta property="twitter:title" content="Polynomial fitting · Optuna.jl"/><meta name="description" content="Documentation for Optuna.jl."/><meta property="og:description" content="Documentation for Optuna.jl."/><meta property="twitter:description" content="Documentation for Optuna.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../overview/">Overview</a></li><li><span class="tocitem">Getting Started</span><ul><li><a class="tocitem" href="../FirstHyperOpt/">First optimization</a></li></ul></li><li><span class="tocitem">Examples</span><ul><li class="is-active"><a class="tocitem" href>Polynomial fitting</a><ul class="internal"><li><a class="tocitem" href="#Data"><span>Data</span></a></li><li><a class="tocitem" href="#Model-builder"><span>Model builder</span></a></li><li><a class="tocitem" href="#Study-configuration"><span>Study configuration</span></a></li><li><a class="tocitem" href="#Objective"><span>Objective</span></a></li><li><a class="tocitem" href="#Run-and-inspect"><span>Run and inspect</span></a></li><li><a class="tocitem" href="#Reuse-the-best-result"><span>Reuse the best result</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../api/">API Reference</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Examples</a></li><li class="is-active"><a href>Polynomial fitting</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Polynomial fitting</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/una-auxme/Optuna.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Polynomial-fitting"><a class="docs-heading-anchor" href="#Polynomial-fitting">Polynomial fitting</a><a id="Polynomial-fitting-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial-fitting" title="Permalink"></a></h1><p>This example shows the pattern used for machine-learning and simulation workloads: wrap the training loop in an Optuna objective, suggest the model and optimizer hyperparameters at the beginning of each trial, report the validation loss during training, and store the best trial data as an artifact.</p><p>The example follows the spirit of the Lux.jl polynomial fitting tutorial. It focuses on the Optuna.jl workflow; install the machine-learning dependencies in the project where you run the example.</p><pre><code class="language-julia hljs">using Optuna
+using Random
+using Statistics
+
+using Lux
+using Optimisers
+using Zygote</code></pre><h2 id="Data"><a class="docs-heading-anchor" href="#Data">Data</a><a id="Data-1"></a><a class="docs-heading-anchor-permalink" href="#Data" title="Permalink"></a></h2><p>The target is a noisy quadratic function.</p><pre><code class="language-julia hljs">function generate_data(rng::AbstractRNG; n=128)
+    x = reshape(collect(range(-2.0f0, 2.0f0; length=n)), 1, n)
+    y = x .^ 2 .- 2.0f0 .* x
+    y .+= 0.1f0 .* randn(rng, Float32, size(y))
+    return x, y
+end
+
+rng = MersenneTwister(12345)
+x, y = generate_data(rng)</code></pre><h2 id="Model-builder"><a class="docs-heading-anchor" href="#Model-builder">Model builder</a><a id="Model-builder-1"></a><a class="docs-heading-anchor-permalink" href="#Model-builder" title="Permalink"></a></h2><p>The trial will choose the number of hidden layers, the hidden size, the activation function, and the learning rate. Keeping model construction in a helper makes the objective easier to read.</p><pre><code class="language-julia hljs">function build_model(num_layers, num_hidden, activation)
+    layers = Any[Dense(1 =&gt; num_hidden, activation)]
+
+    for _ in 2:num_layers
+        push!(layers, Dense(num_hidden =&gt; num_hidden, activation))
+    end
+
+    push!(layers, Dense(num_hidden =&gt; 1))
+    return Chain(layers...)
+end</code></pre><h2 id="Study-configuration"><a class="docs-heading-anchor" href="#Study-configuration">Study configuration</a><a id="Study-configuration-1"></a><a class="docs-heading-anchor-permalink" href="#Study-configuration" title="Permalink"></a></h2><p>Use persistent storage for longer experiments so that finished trials are available after Julia exits. Artifacts are written to a local directory.</p><pre><code class="language-julia hljs">storage_url = create_sqlite_url(&quot;storage&quot;, &quot;polynomial_fitting&quot;)
+storage = RDBStorage(storage_url)
+artifact_store = FileSystemArtifactStore(&quot;artifacts&quot;)
+
+study = Study(
+    &quot;polynomial-fitting&quot;,
+    artifact_store,
+    storage;
+    sampler=TPESampler(seed=123),
+    pruner=MedianPruner(n_startup_trials=5, n_warmup_steps=10),
+    direction=&quot;minimize&quot;,
+    load_if_exists=true,
+)</code></pre><h2 id="Objective"><a class="docs-heading-anchor" href="#Objective">Objective</a><a id="Objective-1"></a><a class="docs-heading-anchor-permalink" href="#Objective" title="Permalink"></a></h2><p>Each trial builds a fresh model and optimizer. The training loop reports loss after every epoch, which gives the pruner enough information to stop unpromising configurations early.</p><pre><code class="language-julia hljs">function objective(trial::Trial)
+    num_layers = suggest_int(trial, &quot;num_layers&quot;, 1, 3)
+    num_hidden = suggest_categorical(trial, &quot;num_hidden&quot;, [4, 8, 16, 32])
+    activation = suggest_categorical(trial, &quot;activation&quot;, [relu, tanh, sigmoid])
+    learning_rate = suggest_float(trial, &quot;learning_rate&quot;, 1e-4, 1e-1; log=true)
+
+    model = build_model(num_layers, num_hidden, activation)
+
+    rng_model = MersenneTwister(2024)
+    ps, st = Lux.setup(rng_model, model)
+    opt_state = Optimisers.setup(Adam(learning_rate), ps)
+
+    loss = Inf
+
+    for epoch in 1:250
+        loss, back = Zygote.pullback(ps) do current_ps
+            y_pred, _ = model(x, current_ps, st)
+            mean(abs2, y_pred .- y)
+        end
+
+        gs = first(back(one(loss)))
+        opt_state, ps = Optimisers.update(opt_state, ps, gs)
+
+        report(trial, Float64(loss), epoch)
+        if should_prune(trial)
+            return nothing
+        end
+    end
+
+    artifact_id = upload_artifact(
+        study,
+        trial,
+        Dict(
+            &quot;num_layers&quot; =&gt; num_layers,
+            &quot;num_hidden&quot; =&gt; num_hidden,
+            &quot;activation&quot; =&gt; string(activation),
+            &quot;learning_rate&quot; =&gt; learning_rate,
+            &quot;parameters&quot; =&gt; ps,
+            &quot;state&quot; =&gt; st,
+            &quot;final_loss&quot; =&gt; Float64(loss),
+        ),
+    )
+    set_user_attr(trial, &quot;artifact_id&quot;, artifact_id)
+
+    return Float64(loss)
+end</code></pre><h2 id="Run-and-inspect"><a class="docs-heading-anchor" href="#Run-and-inspect">Run and inspect</a><a id="Run-and-inspect-1"></a><a class="docs-heading-anchor-permalink" href="#Run-and-inspect" title="Permalink"></a></h2><pre><code class="language-julia hljs">optimize(study, objective; n_trials=50, verbose=true)
+
+println(&quot;Best parameters: &quot;, best_params(study))
+println(&quot;Best value: &quot;, best_value(study))</code></pre><p>The important design choice is that the objective owns a full training run. Optuna.jl does not need to know about Lux internals; it only needs a final score, optional intermediate reports, and optional artifacts.</p><h2 id="Reuse-the-best-result"><a class="docs-heading-anchor" href="#Reuse-the-best-result">Reuse the best result</a><a id="Reuse-the-best-result-1"></a><a class="docs-heading-anchor-permalink" href="#Reuse-the-best-result" title="Permalink"></a></h2><p>The best trial stores its artifact id in the Optuna user attributes. You can use it to download the saved model data.</p><pre><code class="language-julia hljs">using JLD2
+using PythonCall
+
+trial = best_trial(study)
+user_attrs = pyconvert(Dict{String,Any}, trial.trial.user_attrs)
+artifact_id = user_attrs[&quot;artifact_id&quot;]
+artifact_file = &quot;best_model_$(artifact_id).jld2&quot;
+
+download_artifact(study, artifact_id, artifact_file)
+best_data = JLD2.load(artifact_file)</code></pre><p>The artifact contains the trained parameters, model state, and hyperparameters that were saved in the objective.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../FirstHyperOpt/">« First optimization</a><a class="docs-footer-nextpage" href="../api/">API Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Thursday 9 July 2026 07:56">Thursday 9 July 2026</span>. Using Julia version 1.11.9.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
