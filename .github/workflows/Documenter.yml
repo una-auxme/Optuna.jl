@@ -31,10 +31,6 @@ jobs:
           version: '1.11'
           arch: x64
 
-      - name: "Copy readme to doc"
-        run:
-          cp ./README.md ./docs/src/index.md
-
       - name: "Install dependencies"
         run: julia --project=docs/ -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 

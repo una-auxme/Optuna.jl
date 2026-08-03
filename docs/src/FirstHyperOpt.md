@@ -103,3 +103,9 @@ The result should move toward `x = 2`, `y = -1`, and `use_offset = false`, becau
 Define the search space inside the objective with `suggest_int`, `suggest_float`, and `suggest_categorical`. This keeps the sampled values close to the code that uses them and also supports conditional spaces, where later suggestions depend on earlier choices.
 
 For larger objectives, move the actual workload into helper functions and keep the Optuna-specific suggestion calls near the top of the objective.
+
+## License
+
+Optuna.jl and this documentation page are licensed under the project MIT
+license. See the [License](license.md) page for the complete license text and
+the notices for third-party material used elsewhere in the documentation.

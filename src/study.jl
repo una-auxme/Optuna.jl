@@ -2,6 +2,11 @@
 # Copyright (c) 2026 Julian Trommer, Valentin Höpfner, Andreas Hofmann, Josef Kircher, Tobias Thummerer, and contributors
 # Licensed under the MIT license. See LICENSE file in the project root for details.
 #
+# Portions of this file's API documentation and interface descriptions are
+# adapted from Optuna.
+# Copyright (c) 2018 Preferred Networks, Inc.
+# Licensed under the MIT license. See THIRD_PARTY_NOTICES.md in the project root for details.
+#
 
 """
     Study(

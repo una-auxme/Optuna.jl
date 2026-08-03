@@ -67,3 +67,11 @@ println("Best value: ", best_value(study))
 ## How to contribute
 
 Contributors are welcome. Before contributing, please read, understand and follow the [Contributor's Guide](https://github.com/SciML/ColPrac) on Collaborative Practices for Community Packages.
+
+## License
+
+Optuna.jl is available under the [MIT License](LICENSE). Portions of the API
+documentation and interface descriptions are adapted from Optuna, and the
+polynomial-fitting documentation example is adapted from Lux.jl. See
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) for the applicable
+third-party MIT license texts and attribution.

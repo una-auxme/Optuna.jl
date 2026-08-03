@@ -20,6 +20,7 @@ makedocs(;
         "Getting Started" => ["First optimization" => "FirstHyperOpt.md"],
         "Examples" => ["Polynomial fitting" => "FittingPolynomial.md"],
         "API Reference" => "api.md",
+        "License" => "license.md",
     ],
 )
 

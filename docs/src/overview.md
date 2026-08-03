@@ -100,3 +100,9 @@ julia -t 4,1
 ```
 
 For distributed or repeated optimization runs, use persistent storage so that workers share the same trial history.
+
+## License
+
+Optuna.jl and this documentation page are licensed under the project MIT
+license. See the [License](license.md) page for the complete license text and
+the notices for third-party material used elsewhere in the documentation.

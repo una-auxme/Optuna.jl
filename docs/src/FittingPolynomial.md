@@ -149,3 +149,10 @@ best_data = JLD2.load(artifact_file)
 ```
 
 The artifact contains the trained parameters, model state, and hyperparameters that were saved in the objective.
+
+## License
+
+Optuna.jl and the original content on this page are licensed under the project
+MIT license. The polynomial-fitting material is adapted from Lux.jl under its
+MIT license. See the [License](license.md) page for both complete license texts
+and attribution.
