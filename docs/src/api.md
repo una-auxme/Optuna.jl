@@ -129,3 +129,10 @@ Optuna.jl uses CondaPkg for Python dependencies. These helpers are available whe
 is_conda_pkg_installed
 add_conda_pkg
 ```
+
+## License
+
+Optuna.jl and the original content on this page are licensed under the project
+MIT license. Portions of the rendered API documentation and interface
+descriptions are adapted from Optuna under its MIT license. See the
+[License](license.md) page for both complete license texts and attribution.
